@@ -13,7 +13,7 @@ jobs:
       COMMIT_LOG_API: ${{ secrets.COMMIT_LOG_API }}
       GITHUB_LOGIN: ${{ github.actor }} # github login also available in github.triggering_actor, github.event.sender.login
       COMMITS: ${{ toJSON(github.event.commits) }}
-      REPOSITORY_URL: ${{ github.repositoryUrl }}
+      REPOSITORY_URL: https://github.com/${{ github.repository }}
       EVENT_TYPE: ${{ github.event_name }}
       EVENT_ACTION: ${{ github.event.action }}
       PR_MERGED: ${{ github.event.pull_request.merged }}
