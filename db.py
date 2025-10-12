@@ -1,18 +1,15 @@
 from pymongo import MongoClient
 import os
 from dotenv import load_dotenv
-from datetime import datetime, timezone
 
 load_dotenv()
 MONGO_URI = os.getenv("MONGO_URI")
+MONGO_DBNAME = os.getenv("MONGO_DBNAME")
 
-# connecting to MongoDb ...
 client = MongoClient(MONGO_URI)
-db = client['enoughArt'] 
+db = client[MONGO_DBNAME]
 
-# collections
 users_collection = db['users']
 artworks_collection = db['artworks']
-
-
-
+comments_collection = db['comments']
+likes_collection = db['likes']
