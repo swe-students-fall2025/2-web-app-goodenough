@@ -15,3 +15,6 @@ def add_artwork(artist_id, title, description, image_url, tags=[]):
     }
     return artworks_collection.insert_one(artwork)
 
+def get_all_artworks():
+    return list(artworks_collection.find())
+

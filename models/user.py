@@ -14,3 +14,5 @@ def add_user(username, email, password_hash, bio="", profile_image=""):
     }
     return users_collection.insert_one(user)
 
+def get_all_users():
+    return list(users_collection.find())
