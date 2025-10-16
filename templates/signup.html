@@ -17,9 +17,20 @@
         <div class="form-field">
             <input type="text" id="username" name="username" placeholder="Username" required>
         </div>
-        <div class="form-group">
+        <div class="form-field">
             <input type="email" id="email" name="Email Address" required>
         </div>
+        <div class="form-field">
+            <input type="password" id="password" name="password" placeholder="Password" required>
+        </div>
+        <button type="submit" class="action-button">Sign Up</button>
     </form>
+
+    <div class="switch-login">
+        <p>
+            Already have an account?
+            <a href="{{url_for('login')}}">Log in</a>   <!--Go to Login if user has account, also need route here-->
+        </p>
+    </div>
 </body>
 </html>
