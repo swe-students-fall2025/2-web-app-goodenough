@@ -7,30 +7,30 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css')}}">
 </head>
 <body>
-    <div class="signup-wrapper">
-        <div class="signup-header">
+    <div class="logsign-wrapper">
+        <div class="logsign-header">
             <h1>Create your account</h1>
         </div>
-    </div>
+    
+        <form action="{{url_for('signup')}}" method="POST">     <!--need a signup route for this-->
+            <div class="form-field">
+                <input type="text" id="username" name="username" placeholder="Username" required>
+            </div>
+            <div class="form-field">
+                <input type="email" id="email" name="email" placeholder="Email Address" required>
+            </div>
+            <div class="form-field">
+                <input type="password" id="password" name="password" placeholder="Password" required>
+            </div>
+            <button type="submit" class="logsign-button">Sign Up</button>
+        </form>
 
-    <form action="{{url_for('signup')}}" method="POST">     <!--need a signup route for this-->
-        <div class="form-field">
-            <input type="text" id="username" name="username" placeholder="Username" required>
+        <div class="switch-form-link">
+            <p>
+                Already have an account?
+                <a href="{{url_for('login')}}">Log in</a>   <!--Go to Login if user has account, also need route here-->
+            </p>
         </div>
-        <div class="form-field">
-            <input type="email" id="email" name="Email Address" required>
-        </div>
-        <div class="form-field">
-            <input type="password" id="password" name="password" placeholder="Password" required>
-        </div>
-        <button type="submit" class="signup-button">Sign Up</button>
-    </form>
-
-    <div class="switch-login">
-        <p>
-            Already have an account?
-            <a href="{{url_for('login')}}">Log in</a>   <!--Go to Login if user has account, also need route here-->
-        </p>
     </div>
 </body>
 </html>

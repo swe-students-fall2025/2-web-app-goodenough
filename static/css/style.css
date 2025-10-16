@@ -7,6 +7,7 @@
     --text-secondary: #b4b4b4;
     --border-color: #565869;
     --button-bg: #ececf1;
+    --button-text: #202123;
     --button-hover-bg: #ffffff;
     --error-color: #ff5c5c; 
 }
@@ -28,21 +29,21 @@ body {
     padding: 1rem;
 }
 
-/* Here is the signup outer layer */
-.signup-wrapper {
+/* Here is the signup & login outer layer */
+.logsign-wrapper {
     width: 100%;
     max-width: 450px;
     padding: 2.5rem;
     text-align: center;
 }
 
-.signup-header h1{
+.logsign-header h1{
     font-size: 2rem;
     font-weight: 700;
     margin-bottom: 2.5rem;
 }
 
-/* Here is the signup form */
+/* Here is the signup form & login form*/
 .form-field {
     margin-bottom: 1.5rem;
 }
@@ -65,8 +66,8 @@ body {
     border-color: var(--text-primary);
 }
 
-/* Here is the signup button */
-.signup-button {
+/* Here is the signup button & login button */
+.logsign-button {
     width: 100%;
     padding: 14px;
     font-size: 1rem;
@@ -79,22 +80,22 @@ body {
     transition: background-color 0.2s;
     margin-top: 1rem;
 }
-.signup:hover{
+.logsign-button:hover{
     background-color: var(--button-hover-bg);
 }
 
-/* Here is the link to switch to login */
-.switch-login {
+/* Here is the link to switch to login/signup */
+.switch-form-link {
     margin-top: 2rem;
     font-size: 0.9rem;
 }
 
-.switch-login a{
+.switch-form-link a{
     color: var(--text-primary);
     text-decoration: underline;
     font-weight: 500;
 }
 
-.switch-login a:hover {
+.switch-form-link a:hover {
     text-decoration: none;
 }
