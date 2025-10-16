@@ -66,3 +66,35 @@ body {
 }
 
 /* Here is the signup button */
+.signup-button {
+    width: 100%;
+    padding: 14px;
+    font-size: 1rem;
+    font-weight: 500;
+    color: var(--button-text);
+    background-color: var(--button-bg);
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    margin-top: 1rem;
+}
+.signup:hover{
+    background-color: var(--button-hover-bg);
+}
+
+/* Here is the link to switch to login */
+.switch-login {
+    margin-top: 2rem;
+    font-size: 0.9rem;
+}
+
+.switch-login a{
+    color: var(--text-primary);
+    text-decoration: underline;
+    font-weight: 500;
+}
+
+.switch-login a:hover {
+    text-decoration: none;
+}
