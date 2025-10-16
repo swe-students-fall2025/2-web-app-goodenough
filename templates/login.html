@@ -12,6 +12,15 @@
             <h1>Welcome back</h1>
         </div>
 
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="flash {{ category }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+
         <form action="{{ url_for('login') }}" method="POST">        
             <div class="form-field">
                 <input type="email" id="email" name="email" placeholder="Email Address" required>
