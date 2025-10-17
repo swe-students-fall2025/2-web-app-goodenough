@@ -261,3 +261,147 @@ def edit_artwork(artwork_id):
         return redirect(url_for('artwork_detail', artwork_id=artwork_id))
     
     return render_template('edit_artwork.html', artwork=artwork)
+
+@app.route('/artwork/<artwork_id>/delete', methods=['POST'])
+@login_required
+def delete_artwork_route(artwork_id):
+    """Delete artwork"""
+    artwork = get_artwork_by_id(artwork_id)
+    
+    if not artwork or str(artwork['artist_id']) != current_user.id:
+        flash('Unauthorized access', 'error')
+        return redirect(url_for('index'))
+    
+    artworks_collection.delete_one({"_id": ObjectId(artwork_id)})
+    flash('Artwork deleted successfully!', 'success')
+    return redirect(url_for('profile', user_id=current_user.id))
+
+@app.route('/search')
+def search():
+    """Search artworks"""
+    keyword = request.args.get('q', '')
+    medium = request.args.get('medium', '')
+    year = request.args.get('year', type=int)
+    
+    query = {}
+    
+    if keyword:
+        query = {"$or": [
+            {"title": {"$regex": keyword, "$options": "i"}},
+            {"description": {"$regex": keyword, "$options": "i"}},
+            {"tags": {"$regex": keyword, "$options": "i"}}
+        ]}
+    
+    if medium:
+        query["medium"] = medium
+    if year:
+        query["year"] = year
+    
+    artworks = list(artworks_collection.find(query))
+    
+    for artwork in artworks:
+        artwork['artist'] = get_user_by_id(artwork['artist_id'])
+        artwork['likes_count'] = likes_collection.count_documents({"artwork_id": artwork['_id']})
+    
+    return render_template('search_results.html', artworks=artworks, query=keyword)
+
+@app.route('/api/artwork/<artwork_id>/like', methods=['POST'])
+@login_required
+def toggle_like(artwork_id):
+    """Toggle like on artwork"""
+    try:
+        artwork_obj_id = ObjectId(artwork_id)
+        user_obj_id = ObjectId(current_user.id)
+        
+        existing_like = likes_collection.find_one({
+            "artwork_id": artwork_obj_id,
+            "user_id": user_obj_id
+        })
+        
+        if existing_like:
+            likes_collection.delete_one({"_id": existing_like['_id']})
+            liked = False
+        else:
+            likes_collection.insert_one({
+                "artwork_id": artwork_obj_id,
+                "user_id": user_obj_id,
+                "created_at": datetime.now(timezone.utc)
+            })
+            liked = True
+        
+        likes_count = likes_collection.count_documents({"artwork_id": artwork_obj_id})
+        return jsonify({'success': True, 'liked': liked, 'likes_count': likes_count})
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 400
+
+@app.route('/api/artwork/<artwork_id>/comment', methods=['POST'])
+@login_required
+def add_comment_route(artwork_id):
+    """Add comment to artwork"""
+    try:
+        text = request.json.get('text')
+        
+        if not text:
+            return jsonify({'success': False, 'error': 'Comment text required'}), 400
+        
+        comment_data = {
+            "artwork_id": ObjectId(artwork_id),
+            "user_id": ObjectId(current_user.id),
+            "text": text,
+            "created_at": datetime.now(timezone.utc),
+            "updated_at": None
+        }
+        result = comments_collection.insert_one(comment_data)
+        return jsonify({'success': True, 'comment_id': str(result.inserted_id)})
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 400
+
+@app.route('/api/comment/<comment_id>/edit', methods=['PUT'])
+@login_required
+def edit_comment(comment_id):
+    """Edit comment"""
+    try:
+        new_text = request.json.get('text')
+        
+        if not new_text:
+            return jsonify({'success': False, 'error': 'Comment text required'}), 400
+        
+        result = comments_collection.update_one(
+            {"_id": ObjectId(comment_id), "user_id": ObjectId(current_user.id)},
+            {"$set": {"text": new_text, "updated_at": datetime.now(timezone.utc)}}
+        )
+        
+        if result.modified_count > 0:
+            return jsonify({'success': True})
+        else:
+            return jsonify({'success': False, 'error': 'Unauthorized or comment not found'}), 403
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 400
+
+@app.route('/api/comment/<comment_id>/delete', methods=['DELETE'])
+@login_required
+def delete_comment_route(comment_id):
+    """Delete comment"""
+    try:
+        result = comments_collection.delete_one({
+            "_id": ObjectId(comment_id),
+            "user_id": ObjectId(current_user.id)
+        })
+        
+        if result.deleted_count > 0:
+            return jsonify({'success': True})
+        else:
+            return jsonify({'success': False, 'error': 'Unauthorized or comment not found'}), 403
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 400
+
+@app.errorhandler(404)
+def not_found(e):
+    return render_template('404.html'), 404
+
+@app.errorhandler(500)
+def internal_error(e):
+    return render_template('500.html'), 500
+
+if __name__ == '__main__':
+    app.run(debug=True)
