@@ -2,7 +2,6 @@
 from db import artworks_collection
 from datetime import datetime, timezone
 
-
 # -- artworks
 def add_artwork(artist_id, title, description, image_url, tags=[]):
     artwork = {
