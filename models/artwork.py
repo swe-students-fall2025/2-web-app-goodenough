@@ -4,8 +4,9 @@ from db import artworks_collection
 from bson.objectid import ObjectId
 from datetime import datetime, timezone
 
-def add_artwork(artist_id, title, description, image_url, tags, medium, year, price, process_images):
-    artwork_data = {
+# -- artworks
+def add_artwork(artist_id, title, description, image_url, tags=[]):
+    artwork = {
         "artist_id": artist_id,
         "title": title,
         "description": description,
