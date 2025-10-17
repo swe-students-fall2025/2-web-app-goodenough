@@ -1,8 +1,6 @@
-# models/user.py
 from db import users_collection
 from datetime import datetime, timezone
 
-# -- users
 def add_user(username, email, password_hash, bio="", profile_image=""):
     user = {
         "username": username,
@@ -16,3 +14,4 @@ def add_user(username, email, password_hash, bio="", profile_image=""):
 
 def get_all_users():
     return list(users_collection.find())
+
