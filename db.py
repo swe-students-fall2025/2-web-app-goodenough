@@ -7,7 +7,7 @@ MONGO_URI = os.getenv("MONGO_URI")
 MONGO_DBNAME = os.getenv("MONGO_DBNAME")
 
 _client = MongoClient(MONGO_URI)
-_db = _client[MONGO_DBNAME]
+_db = _client[DB_NAME]
 
 users_collection = _db.get_collection['users']
 artworks_collection = _db.get_collection['artworks']
