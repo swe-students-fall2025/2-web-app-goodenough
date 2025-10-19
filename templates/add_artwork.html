@@ -1,0 +1,457 @@
+<!-- templates/add_edit_artwork.html -->
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>
+        {% if artwork %}Edit {{ artwork.title }}{% else %}Add New Artwork{% endif %} - Art sharing platform
+    </title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .form-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 2rem 0;
+        }
+        .form-card {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+        .form-header {
+            border-bottom: 1px solid #e9ecef;
+            padding-bottom: 1rem;
+            margin-bottom: 2rem;
+        }
+        .preview-image {
+            max-width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 8px;
+            margin-top: 0.5rem;
+            display: none;
+        }
+        .process-image-preview {
+            width: 100px;
+            height: 100px;
+            object-fit: cover;
+            border-radius: 8px;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+        .image-preview-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        .tag-badge {
+            background-color: #e9ecef;
+            color: #495057;
+            padding: 0.375rem 0.75rem;
+            border-radius: 50px;
+            margin-right: 0.5rem;
+            margin-bottom: 0.5rem;
+            display: inline-block;
+        }
+        .tag-badge .remove-tag {
+            margin-left: 0.5rem;
+            cursor: pointer;
+            color: #6c757d;
+        }
+        .tag-badge .remove-tag:hover {
+            color: #dc3545;
+        }
+        .step-indicator {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        .step-number {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background-color: #007bff;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 10px;
+            font-weight: bold;
+        }
+        .step-active .step-number {
+            background-color: #28a745;
+        }
+    </style>
+</head>
+<body>
+    <!-- 导航栏 -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="{{ url_for('index') }}">
+                <i class="fas fa-palette"></i> Artfolio
+            </a>
+
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <!-- 搜索框 -->
+                <form class="d-flex search-box me-3" action="{{ url_for('search') }}" method="GET">
+                    <input class="form-control me-2" type="search" name="q" placeholder="Search for artworks..." aria-label="Search">
+                    <button class="btn btn-outline-light" type="submit">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </form>
+
+                <ul class="navbar-nav ms-auto">
+                    {% if current_user.is_authenticated %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('add_artwork_route') }}">
+                                <i class="fas fa-plus"></i> Publish work
+                            </a>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown">
+                                {{ current_user.username }}
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="{{ url_for('profile', user_id=current_user.id) }}">My Homepage</a></li>
+                                <li><a class="dropdown-item" href="{{ url_for('edit_profile') }}">Edit Profile</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="{{ url_for('logout') }}">Log out</a></li>
+                            </ul>
+                        </li>
+                    {% else %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('login') }}">Login</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('signup') }}">Register</a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 主要内容 -->
+    <div class="container form-container">
+        <!-- 页面标题 -->
+        <div class="form-header">
+            <h1 class="h3 mb-0">
+                {% if artwork %}
+                    <i class="fas fa-edit text-primary"></i> Edit Artwork
+                {% else %}
+                    <i class="fas fa-plus text-success"></i> Add New Artwork
+                {% endif %}
+            </h1>
+            <p class="text-muted mb-0">
+                {% if artwork %}
+                    Update your artwork details
+                {% else %}
+                    Share your creative work with the community
+                {% endif %}
+            </p>
+        </div>
+
+        <!-- 表单 -->
+        <form method="POST" enctype="multipart/form-data" id="artworkForm">
+            <div class="form-card">
+                <!-- 步骤指示器 -->
+                <div class="step-indicator step-active">
+                    <div class="step-number">1</div>
+                    <span>Basic Information</span>
+                </div>
+
+                <!-- 标题 -->
+                <div class="mb-3">
+                    <label for="title" class="form-label">Title *</label>
+                    <input type="text" class="form-control" id="title" name="title"
+                           value="{{ artwork.title if artwork }}"
+                           placeholder="Enter artwork title" required>
+                </div>
+
+                <!-- 图片URL -->
+                <div class="mb-3">
+                    <label for="image_url" class="form-label">Main Image URL *</label>
+                    <input type="url" class="form-control" id="image_url" name="image_url"
+                           value="{{ artwork.image_url if artwork }}"
+                           placeholder="https://example.com/image.jpg" required>
+                    <div class="form-text">Provide a direct link to your artwork image</div>
+                    <!-- 图片预览 -->
+                    <img id="imagePreview" class="preview-image" alt="Image preview">
+                </div>
+
+                <!-- 描述 -->
+                <div class="mb-3">
+                    <label for="description" class="form-label">Description *</label>
+                    <textarea class="form-control" id="description" name="description" rows="4"
+                              placeholder="Describe your artwork, inspiration, techniques used..." required>{{ artwork.description if artwork }}</textarea>
+                </div>
+            </div>
+
+            <div class="form-card">
+                <div class="step-indicator step-active">
+                    <div class="step-number">2</div>
+                    <span>Artwork Details</span>
+                </div>
+
+                <div class="row">
+                    <!-- 媒介 -->
+                    <div class="col-md-6 mb-3">
+                        <label for="medium" class="form-label">Medium</label>
+                        <select class="form-select" id="medium" name="medium">
+                            <option value="">Select medium</option>
+                            <option value="Oil Painting" {% if artwork and artwork.medium == 'Oil Painting' %}selected{% endif %}>Oil Painting</option>
+                            <option value="Watercolor" {% if artwork and artwork.medium == 'Watercolor' %}selected{% endif %}>Watercolor</option>
+                            <option value="Acrylic" {% if artwork and artwork.medium == 'Acrylic' %}selected{% endif %}>Acrylic</option>
+                            <option value="Digital Art" {% if artwork and artwork.medium == 'Digital Art' %}selected{% endif %}>Digital Art</option>
+                            <option value="Sculpture" {% if artwork and artwork.medium == 'Sculpture' %}selected{% endif %}>Sculpture</option>
+                            <option value="Photography" {% if artwork and artwork.medium == 'Photography' %}selected{% endif %}>Photography</option>
+                            <option value="Drawing" {% if artwork and artwork.medium == 'Drawing' %}selected{% endif %}>Drawing</option>
+                            <option value="Mixed Media" {% if artwork and artwork.medium == 'Mixed Media' %}selected{% endif %}>Mixed Media</option>
+                            <option value="Print" {% if artwork and artwork.medium == 'Print' %}selected{% endif %}>Print</option>
+                            <option value="Other" {% if artwork and artwork.medium == 'Other' %}selected{% endif %}>Other</option>
+                        </select>
+                    </div>
+
+                    <!-- 年份 -->
+                    <div class="col-md-6 mb-3">
+                        <label for="year" class="form-label">Year</label>
+                        <input type="number" class="form-control" id="year" name="year"
+                               value="{{ artwork.year if artwork }}"
+                               min="1900" max="2030"
+                               placeholder="e.g., 2023">
+                    </div>
+                </div>
+
+                <!-- 价格 -->
+                <div class="mb-3">
+                    <label for="price" class="form-label">Price (Optional)</label>
+                    <div class="input-group">
+                        <span class="input-group-text">¥</span>
+                        <input type="number" class="form-control" id="price" name="price"
+                               value="{{ artwork.price if artwork }}"
+                               min="0" step="0.01"
+                               placeholder="0.00">
+                    </div>
+                    <div class="form-text">Leave empty if not for sale</div>
+                </div>
+
+                <!-- 标签 -->
+                <div class="mb-3">
+                    <label for="tags" class="form-label">Tags</label>
+                    <input type="text" class="form-control" id="tags"
+                           placeholder="Enter tags separated by commas (e.g., landscape, abstract, portrait)">
+                    <div class="form-text">Add relevant tags to help others discover your artwork</div>
+                    <!-- 标签展示区域 -->
+                    <div id="tagsContainer" class="mt-2">
+                        {% if artwork and artwork.tags %}
+                            {% for tag in artwork.tags %}
+                                <span class="tag-badge">
+                                    {{ tag }}
+                                    <span class="remove-tag" data-tag="{{ tag }}">×</span>
+                                </span>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+                    <input type="hidden" id="tagsInput" name="tags"
+                           value="{{ artwork.tags|join(',') if artwork and artwork.tags }}">
+                </div>
+            </div>
+
+            <div class="form-card">
+                <div class="step-indicator">
+                    <div class="step-number">3</div>
+                    <span>Process Images (Optional)</span>
+                </div>
+
+                <!-- 创作过程图片 -->
+                <div class="mb-3">
+                    <label for="process_images" class="form-label">Process Images URLs</label>
+                    <textarea class="form-control" id="process_images" name="process_images" rows="3"
+                              placeholder="Enter URLs for process images, one per line">{{ artwork.process_images|join('\n') if artwork and artwork.process_images }}</textarea>
+                    <div class="form-text">Add URLs showing your creative process (one URL per line)</div>
+
+                    <!-- 过程图片预览 -->
+                    <div id="processImagesPreview" class="image-preview-container mt-2">
+                        {% if artwork and artwork.process_images %}
+                            {% for process_image in artwork.process_images %}
+                                <img src="{{ process_image }}" class="process-image-preview" alt="Process image {{ loop.index }}">
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- 提交按钮 -->
+            <div class="d-flex justify-content-between">
+                <a href="{% if artwork %}{{ url_for('artwork_detail', artwork_id=artwork._id) }}{% else %}{{ url_for('index') }}{% endif %}"
+                   class="btn btn-outline-secondary">
+                    <i class="fas fa-arrow-left"></i> Cancel
+                </a>
+                <button type="submit" class="btn btn-primary">
+                    {% if artwork %}
+                        <i class="fas fa-save"></i> Update Artwork
+                    {% else %}
+                        <i class="fas fa-plus"></i> Publish Artwork
+                    {% endif %}
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <footer class="bg-dark text-light py-4 mt-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6 text-md-end">
+                    <p>&copy; 2025 Art sharing platform.</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap & jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        $(document).ready(function() {
+            // 图片URL预览
+            $('#image_url').on('input', function() {
+                const url = $(this).val();
+                const preview = $('#imagePreview');
+
+                if (url) {
+                    preview.attr('src', url).show();
+                } else {
+                    preview.hide();
+                }
+            });
+
+            // 初始预览（编辑模式）
+            {% if artwork and artwork.image_url %}
+                $('#imagePreview').attr('src', '{{ artwork.image_url }}').show();
+            {% endif %}
+
+            // 标签管理
+            $('#tags').on('keypress', function(e) {
+                if (e.which === 13 || e.which === 44) { // Enter or comma
+                    e.preventDefault();
+                    addTag($(this).val().trim());
+                    $(this).val('');
+                }
+            });
+
+            function addTag(tagText) {
+                if (!tagText) return;
+
+                // 检查是否已存在
+                if ($('#tagsContainer').find('.tag-badge:contains("' + tagText + '")').length > 0) {
+                    return;
+                }
+
+                const tagHtml = `
+                    <span class="tag-badge">
+                        ${tagText}
+                        <span class="remove-tag" data-tag="${tagText}">×</span>
+                    </span>
+                `;
+
+                $('#tagsContainer').append(tagHtml);
+                updateTagsInput();
+            }
+
+            // 移除标签
+            $(document).on('click', '.remove-tag', function() {
+                $(this).closest('.tag-badge').remove();
+                updateTagsInput();
+            });
+
+            function updateTagsInput() {
+                const tags = [];
+                $('#tagsContainer .tag-badge').each(function() {
+                    tags.push($(this).contents().filter(function() {
+                        return this.nodeType === 3; // Text node
+                    }).text().trim());
+                });
+                $('#tagsInput').val(tags.join(','));
+            }
+
+            // 过程图片URL预览
+            $('#process_images').on('input', function() {
+                const urls = $(this).val().split('\n').filter(url => url.trim());
+                const container = $('#processImagesPreview');
+                container.empty();
+
+                urls.forEach(url => {
+                    if (url.trim()) {
+                        const img = $('<img>', {
+                            class: 'process-image-preview',
+                            src: url.trim(),
+                            alt: 'Process image',
+                            onerror: "this.style.display='none'"
+                        });
+                        container.append(img);
+                    }
+                });
+            });
+
+            // 表单提交验证
+            $('#artworkForm').on('submit', function(e) {
+                const title = $('#title').val().trim();
+                const imageUrl = $('#image_url').val().trim();
+                const description = $('#description').val().trim();
+
+                if (!title) {
+                    e.preventDefault();
+                    alert('Please enter a title for your artwork');
+                    $('#title').focus();
+                    return;
+                }
+
+                if (!imageUrl) {
+                    e.preventDefault();
+                    alert('Please provide an image URL for your artwork');
+                    $('#image_url').focus();
+                    return;
+                }
+
+                ifedit_artwork.html (!description) {
+                    e.preventDefault();
+                    alert('Please enter a description for your artwork');
+                    $('#description').focus();
+                    return;
+                }
+
+                // 显示提交中状态
+                const submitBtn = $(this).find('button[type="submit"]');
+                submitBtn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Publishing...');
+            });
+
+            // 搜索框回车提交
+            $('input[name="q"]').keypress(function(e) {
+                if (e.which === 13) {
+                    $(this).closest('form').submit();
+                }
+            });
+
+            // 初始化标签输入（编辑模式）
+            {% if artwork and artwork.tags %}
+                updateTagsInput();
+            {% endif %}
+
+            // 初始化过程图片预览（编辑模式）
+            {% if artwork and artwork.process_images %}
+                $('#process_images').trigger('input');
+            {% endif %}
+        });
+    </script>
+</body>
+</html>
