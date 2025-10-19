@@ -1,0 +1,345 @@
+<!-- templates/profile.html -->
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ user.username }} - Artfolio</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .profile-banner {
+            height: 300px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            position: relative;
+            margin-bottom: 100px;
+        }
+        .profile-banner img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .profile-avatar {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            border: 5px solid white;
+            object-fit: cover;
+            position: absolute;
+            bottom: -75px;
+            left: 50px;
+            background-color: white;
+        }
+        .profile-info {
+            margin-left: 220px;
+            padding: 20px 0;
+        }
+        .artwork-card {
+            transition: transform 0.2s;
+            margin-bottom: 2rem;
+            border: none;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .artwork-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+        }
+        .artwork-image {
+            height: 250px;
+            object-fit: cover;
+            width: 100%;
+        }
+        .like-btn {
+            border: none;
+            background: none;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+        .like-btn:hover {
+            color: #dc3545;
+        }
+        .liked {
+            color: #dc3545;
+        }
+        .social-links a {
+            color: #6c757d;
+            text-decoration: none;
+            transition: color 0.2s;
+            margin-right: 15px;
+            font-size: 1.2rem;
+        }
+        .social-links a:hover {
+            color: #007bff;
+        }
+        .stats-card {
+            background: white;
+            border-radius: 10px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+        .stats-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #007bff;
+        }
+        .stats-label {
+            color: #6c757d;
+            font-size: 0.9rem;
+        }
+        .empty-state {
+            padding: 4rem 2rem;
+            text-align: center;
+            color: #6c757d;
+        }
+        .nav-tabs .nav-link {
+            border: none;
+            color: #6c757d;
+            font-weight: 500;
+            padding: 0.8rem 1.5rem;
+        }
+        .nav-tabs .nav-link.active {
+            color: #007bff;
+            border-bottom: 3px solid #007bff;
+            background: none;
+        }
+    </style>
+</head>
+<body>
+    <!-- 导航栏 -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="{{ url_for('index') }}">
+                <i class="fas fa-palette"></i> Artfolio
+            </a>
+
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <!-- 搜索框 -->
+                <form class="d-flex search-box me-3" action="{{ url_for('search') }}" method="GET">
+                    <input class="form-control me-2" type="search" name="q" placeholder="Search for artworks..." aria-label="Search">
+                    <button class="btn btn-outline-light" type="submit">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </form>
+
+                <ul class="navbar-nav ms-auto">
+                    {% if current_user.is_authenticated %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('add_artwork_route') }}">
+                                <i class="fas fa-plus"></i> Publish work
+                            </a>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown">
+                                {{ current_user.username }}
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="{{ url_for('profile', user_id=current_user.id) }}">My Homepage</a></li>
+                                <li><a class="dropdown-item" href="{{ url_for('edit_profile') }}">Edit Profile</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="{{ url_for('logout') }}">Log out</a></li>
+                            </ul>
+                        </li>
+                    {% else %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('login') }}">Login</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('signup') }}">Register</a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 个人主页内容 -->
+    <div class="container-fluid px-0">
+        <!-- Banner区域 -->
+        <div class="profile-banner">
+              <!--{% if user.banner_image %}
+            <img src="{{ user.banner_image }}" alt="Banner">
+            {% endif %} -->
+            <div class="container position-relative h-100">
+                <!-- 头像 -->
+            <h2 style="text-align: center;line-height: 250px;font-weight: bold;color: #fff;font-size: 50px;">{{ user.username }}</h2>
+
+                <!-- 编辑按钮（仅本人可见） -->
+                {% if current_user.is_authenticated and current_user.id == user._id|string %}
+                <div class="position-absolute top-0 end-0 m-3">
+                    <a href="{{ url_for('edit_profile') }}" class="btn btn-light">
+                        <i class="fas fa-edit"></i> Edit Profile
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                <!-- 左侧：个人信息 -->
+                <div class="col-lg-4">
+                    <div class="profile-info">
+                        <h1 class="h2 mb-2">{{ user.username }}</h1>
+
+                        <!-- Bio -->
+                        {% if user.bio %}
+                        <p class="text-muted mb-3">{{ user.bio }}</p>
+                        {% else %}
+                        <p class="text-muted mb-3 fst-italic">This artist hasn't written a bio yet.</p>
+                        {% endif %}
+
+                        <!-- 社交链接 -->
+                        {% if user.social_links and (user.social_links.instagram or user.social_links.twitter or user.social_links.website) %}
+                        <div class="social-links mb-4">
+                            {% if user.social_links.website %}
+                            <a href="{{ user.social_links.website }}" target="_blank" title="Website">
+                                <i class="fas fa-globe"></i>
+                            </a>
+                            {% endif %}
+                            {% if user.social_links.instagram %}
+                            <a href="{{ user.social_links.instagram }}" target="_blank" title="Instagram">
+                                <i class="fab fa-instagram"></i>
+                            </a>
+                            {% endif %}
+                            {% if user.social_links.twitter %}
+                            <a href="{{ user.social_links.twitter }}" target="_blank" title="Twitter">
+                                <i class="fab fa-twitter"></i>
+                            </a>
+                            {% endif %}
+                        </div>
+                        {% endif %}
+
+                    </div>
+                </div>
+
+                <!-- 右侧：作品展示 -->
+                <div class="col-lg-8">
+                    <!-- 标签页导航 -->
+                    <ul class="nav nav-tabs mb-4" id="profileTabs">
+                        <li class="nav-item">
+                            <a class="nav-link active" id="artworks-tab" data-bs-toggle="tab" href="#artworks">
+                                <i class="fas fa-images"></i> Artworks ({{ artworks|length }})
+                            </a>
+                        </li>
+                    </ul>
+
+                    <!-- 标签页内容 -->
+                    <div class="tab-content" id="profileTabsContent">
+                        <!-- 艺术作品标签页 -->
+                        <div class="tab-pane fade show active" id="artworks">
+                            {% if artworks %}
+                            <div class="row">
+                                {% for artwork in artworks %}
+                                <div class="col-lg-4 col-md-6">
+                                    <div class="card artwork-card">
+                                        <!-- 艺术作品图片 -->
+                                        <a href="{{ url_for('artwork_detail', artwork_id=artwork._id) }}">
+                                            <img src="{{ artwork.image_url }}" class="card-img-top artwork-image" alt="{{ artwork.title }}">
+                                        </a>
+
+                                        <div class="card-body">
+                                            <!-- 标题 -->
+                                            <h6 class="card-title">{{ artwork.title }}</h6>
+
+                                            <!-- 描述 -->
+                                            <p class="card-text text-muted small">{{ artwork.description[:80] }}{% if artwork.description|length > 80 %}...{% endif %}</p>
+
+                                            <!-- 作品信息 -->
+                                            <div class="d-flex justify-content-between text-muted small mb-2">
+                                                {% if artwork.medium %}
+                                                <span><i class="fas fa-brush"></i> {{ artwork.medium }}</span>
+                                                {% endif %}
+                                                {% if artwork.year %}
+                                                <span><i class="fas fa-calendar"></i> {{ artwork.year }}</span>
+                                                {% endif %}
+                                            </div>
+
+                                            <!-- 互动按钮 -->
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <div class="d-flex align-items-center">
+                                                    <!-- 点赞按钮 -->
+                                                    <span class="text-muted me-3">
+                                                        <i class="fas fa-heart text-danger"></i> {{ artwork.likes_count }}
+                                                    </span>
+                                                </div>
+
+                                                <small class="text-muted">
+                                                    {{ artwork.created_at.strftime('%Y-%m-%d') }}
+                                                </small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                            {% else %}
+                            <!-- 没有作品的空状态 -->
+                            <div class="empty-state">
+                                <i class="fas fa-palette fa-4x mb-3"></i>
+                                <h3>No Artworks Yet</h3>
+                                <p class="mb-4">
+                                    {% if current_user.is_authenticated and current_user.id == user._id|string %}
+                                    Start sharing your creative work with the community!
+                                    {% else %}
+                                    This artist hasn't shared any artworks yet.
+                                    {% endif %}
+                                </p>
+                                {% if current_user.is_authenticated and current_user.id == user._id|string %}
+                                <a href="{{ url_for('add_artwork_route') }}" class="btn btn-primary">
+                                    <i class="fas fa-plus"></i> Publish Your First Artwork
+                                </a>
+                                {% endif %}
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="bg-dark text-light py-4 mt-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6 text-md-end">
+                    <p>&copy; 2025 Art sharing platform.</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap & jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        $(document).ready(function() {
+            // 搜索框回车提交
+            $('input[name="q"]').keypress(function(e) {
+                if (e.which === 13) {
+                    $(this).closest('form').submit();
+                }
+            });
+
+            // 标签页切换
+            $('#profileTabs a').on('click', function (e) {
+                e.preventDefault();
+                $(this).tab('show');
+            });
+
+            // 艺术作品卡片点击事件（除了点赞按钮）
+            $('.artwork-card').on('click', function(e) {
+                if (!$(e.target).closest('.like-btn').length && !$(e.target).is('.like-btn')) {
+                    window.location = $(this).find('a').attr('href');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
