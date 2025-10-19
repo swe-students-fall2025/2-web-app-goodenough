@@ -1,0 +1,601 @@
+<!-- templates/artwork_detail.html -->
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ artwork.title }} - Artfolio</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@9/swiper-bundle.min.css">
+    <style>
+        .artwork-hero {
+            background-color: #f8f9fa;
+            padding: 3rem 0;
+            margin-bottom: 3rem;
+        }
+        .artwork-image {
+            width: 100%;
+            max-height: 600px;
+            object-fit: contain;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+        .artist-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+        .like-btn {
+            border: none;
+            background: none;
+            cursor: pointer;
+            transition: all 0.3s;
+            padding: 0.5rem 1rem;
+            border-radius: 25px;
+            border: 2px solid #e9ecef;
+        }
+        .like-btn:hover {
+            border-color: #dc3545;
+            transform: scale(1.05);
+        }
+        .like-btn.liked {
+            background-color: #dc3545;
+            color: white;
+            border-color: #dc3545;
+        }
+        .like-btn:disabled {
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+        .process-slider {
+            margin: 2rem 0;
+        }
+        .swiper {
+            width: 100%;
+            height: 300px;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        .swiper-slide {
+            text-align: center;
+            background: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .swiper-slide img {
+            display: block;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .comment-section {
+            background-color: #f8f9fa;
+            border-radius: 10px;
+            padding: 2rem;
+            margin-top: 3rem;
+        }
+        .comment {
+            border-bottom: 1px solid #e9ecef;
+            padding: 1rem 0;
+        }
+        .comment:last-child {
+            border-bottom: none;
+        }
+        .comment-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+        .comment-form {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        .price-tag {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #28a745;
+        }
+        .info-card {
+            background: white;
+            border-radius: 10px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 1.5rem;
+        }
+        .nav-link.active {
+            font-weight: bold;
+            border-bottom: 2px solid #007bff;
+        }
+    </style>
+</head>
+<body>
+    <!-- 导航栏 -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="{{ url_for('index') }}">
+                <i class="fas fa-palette"></i> Artfolio
+            </a>
+
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <!-- 搜索框 -->
+                <form class="d-flex search-box me-3" action="{{ url_for('search') }}" method="GET">
+                    <input class="form-control me-2" type="search" name="q" placeholder="Search for artworks..." aria-label="Search">
+                    <button class="btn btn-outline-light" type="submit">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </form>
+
+                <ul class="navbar-nav ms-auto">
+                    {% if current_user.is_authenticated %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('add_artwork_route') }}">
+                                <i class="fas fa-plus"></i> Publish work
+                            </a>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown">
+                                {{ current_user.username }}
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="{{ url_for('profile', user_id=current_user.id) }}">My Homepage</a></li>
+                                <li><a class="dropdown-item" href="{{ url_for('edit_profile') }}">Edit Profile</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="{{ url_for('logout') }}">Log out</a></li>
+                            </ul>
+                        </li>
+                    {% else %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('login') }}">Login</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('signup') }}">Register</a></li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 面包屑导航 -->
+    <div class="container mt-3">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{{ url_for('index') }}">Home</a></li>
+                <li class="breadcrumb-item"><a href="{{ url_for('profile', user_id=artwork.artist_id) }}">{{ artist.username }}</a></li>
+                <li class="breadcrumb-item active">{{ artwork.title }}</li>
+            </ol>
+        </nav>
+    </div>
+
+    <!-- 主要内容 -->
+    <div class="container">
+        <div class="row">
+            <!-- 左侧：作品图片 -->
+            <div class="col-lg-8">
+                <div class="artwork-hero text-center">
+                    <img src="{{ artwork.image_url }}" alt="{{ artwork.title }}" class="artwork-image">
+                </div>
+
+                <!-- 创作过程 Slider -->
+                {% if artwork.process_images and artwork.process_images|length > 0 %}
+                <div class="process-slider">
+                    <h4>Creation Process</h4>
+                    <p class="text-muted">Swipe to view the creative journey</p>
+                    <div class="swiper mySwiper">
+                        <div class="swiper-wrapper">
+                            {% for process_image in artwork.process_images %}
+                            <div class="swiper-slide">
+                                <img src="{{ process_image }}" alt="Process step {{ loop.index }}">
+                            </div>
+                            {% endfor %}
+                        </div>
+                        <div class="swiper-button-next"></div>
+                        <div class="swiper-button-prev"></div>
+                        <div class="swiper-pagination"></div>
+                    </div>
+                </div>
+                {% else %}
+                <div class="process-slider">
+                    <h4>Creation Process</h4>
+                    <p class="text-muted">No process images available</p>
+                    <div class="swiper mySwiper">
+                        <div class="swiper-wrapper">
+                            <!-- 占位图 -->
+                            {% for i in range(5) %}
+                            <div class="swiper-slide bg-light d-flex align-items-center justify-content-center">
+                                <div class="text-center text-muted">
+                                    <i class="fas fa-image fa-3x mb-2"></i>
+                                    <p>Process Step {{ i + 1 }}</p>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        <div class="swiper-button-next"></div>
+                        <div class="swiper-button-prev"></div>
+                        <div class="swiper-pagination"></div>
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- 作品描述 -->
+                <div class="info-card">
+                    <h4>About this Artwork</h4>
+                    <p class="mb-0">{{ artwork.description }}</p>
+                </div>
+            </div>
+
+            <!-- 右侧：作品信息 -->
+            <div class="col-lg-4">
+                <div class="info-card">
+                    <h2 class="mb-3">{{ artwork.title }}</h2>
+
+                    <!-- 艺术家信息 -->
+                    <div class="d-flex align-items-center mb-3">
+                        {% if artist %}
+                        <div>
+                            <h5 class="mb-0">{{ artist.username }}</h5>
+                            <a href="{{ url_for('profile', user_id=artwork.artist_id) }}" class="text-muted small">View Profile</a>
+                        </div>
+                        {% else %}
+                        <span class="text-muted">User has been deleted</span>
+                        {% endif %}
+                    </div>
+
+                    <hr>
+
+                    <!-- 作品详情 -->
+                    <div class="mb-3">
+                        <div class="row mb-2">
+                            <div class="col-4 text-muted">Medium:</div>
+                            <div class="col-8">
+                                {% if artwork.medium %}
+                                <span class="badge bg-primary">{{ artwork.medium }}</span>
+                                {% else %}
+                                <span class="text-muted">Not specified</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="row mb-2">
+                            <div class="col-4 text-muted">Year:</div>
+                            <div class="col-8">
+                                {% if artwork.year %}
+                                {{ artwork.year }}
+                                {% else %}
+                                <span class="text-muted">Not specified</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="row mb-2">
+                            <div class="col-4 text-muted">Price:</div>
+                            <div class="col-8">
+                                {% if artwork.price %}
+                                <span class="price-tag">¥{{ artwork.price }}</span>
+                                {% else %}
+                                <span class="text-muted">Not for sale</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-4 text-muted">Created:</div>
+                            <div class="col-8">
+                                {{ artwork.created_at.strftime('%B %d, %Y') }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr>
+
+                    <!-- 标签 -->
+                    {% if artwork.tags and artwork.tags|length > 0 %}
+                    <div class="mb-3" style="display: none;">
+                        <h6>Tags</h6>
+                        {% for tag in artwork.tags %}
+                        <span class="badge bg-secondary me-1">#{{ tag }}</span>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+
+                    <!-- 点赞和统计 -->
+                    <div class="d-flex justify-content-between align-items-center">
+                        <button class="like-btn {% if user_liked %}liked{% endif %}"
+                                id="likeButton"
+                                data-artwork-id="{{ artwork._id }}"
+                                {% if not current_user.is_authenticated %}disabled{% endif %}>
+                            <i class="fas fa-heart {% if user_liked %}liked{% endif %}"></i>
+                            <span class="likes-count">{{ likes_count }}</span>
+                        </button>
+
+                        <div class="text-muted" style="display: none;">
+                            <i class="fas fa-eye me-1"></i>
+                            <small>Views: {{ artwork.get('views', 0) }}</small>
+                        </div>
+                    </div>
+
+                    {% if current_user.is_authenticated and current_user.id == artwork.artist_id %}
+                    <hr>
+                    <div class="d-grid gap-2" >
+                        <a href="{{ url_for('edit_artwork', artwork_id=artwork._id) }}" class="btn btn-outline-primary">
+                            <i class="fas fa-edit"></i> Edit Artwork
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <div class="info-card"  style="display: none;">
+                    <h6>Share this artwork</h6>
+                    <div class="d-flex gap-2">
+                        <button class="btn btn-outline-secondary btn-sm">
+                            <i class="fas fa-link"></i> Copy Link
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 评论区 -->
+        <div class="comment-section" id="comments">
+            <div class="row">
+                <div class="col-12">
+                    <h4 class="mb-4">
+                        Comments
+                        <span class="badge bg-primary">{{ comments|length }}</span>
+                    </h4>
+
+                    <!-- 评论表单 -->
+                    {% if current_user.is_authenticated %}
+                    <div class="comment-form mb-4">
+                        <form id="commentForm">
+                            <div class="mb-3">
+                                <label for="commentText" class="form-label">Add a comment</label>
+                                <textarea class="form-control" id="commentText" rows="3" placeholder="Share your thoughts about this artwork..." required></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Post Comment</button>
+                        </form>
+                    </div>
+                    {% else %}
+                    <div class="alert alert-info">
+                        <a href="{{ url_for('login') }}" class="alert-link">Login</a> to post a comment.
+                    </div>
+                    {% endif %}
+
+                    <!-- 评论列表 -->
+                    <div id="commentsList">
+                        {% if comments %}
+                            {% for comment in comments %}
+                            <div class="comment" id="comment-{{ comment._id }}">
+                                <div class="d-flex">
+                                    {% if comment.user %}
+                                    <img style="display: none;" src="{{ comment.user.profile_image }}" alt="{{ comment.user.username }}" class="comment-avatar me-3">
+                                    <div class="flex-grow-1">
+                                        <div class="d-flex justify-content-between align-items-start">
+                                            <div>
+                                                <h6 class="mb-0">{{ comment.user.username }}</h6>
+                                                <small class="text-muted">{{ comment.created_at.strftime('%B %d, %Y at %H:%M') }}</small>
+                                                {% if comment.updated_at %}
+                                                <small class="text-muted">(edited)</small>
+                                                {% endif %}
+                                            </div>
+                                            {% if current_user.is_authenticated and current_user.id == comment.user_id|string %}
+                                            <div class="dropdown">
+                                                <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                                    <i class="fas fa-ellipsis-v"></i>
+                                                </button>
+                                                <ul class="dropdown-menu">
+                                                    <li><a class="dropdown-item edit-comment" href="#" data-comment-id="{{ comment._id }}" style="display: none;">Edit</a></li>
+                                                    <li><a class="dropdown-item delete-comment" href="#" data-comment-id="{{ comment._id }}">Delete</a></li>
+                                                </ul>
+                                            </div>
+                                            {% endif %}
+                                        </div>
+                                        <p class="mt-2 mb-0 comment-text">{{ comment.text }}</p>
+                                    </div>
+                                    {% else %}
+                                    <div class="text-muted">
+                                        <i>User has been deleted</i>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            {% endfor %}
+                        {% else %}
+                            <div class="text-center py-4">
+                                <i class="fas fa-comments fa-2x text-muted mb-3"></i>
+                                <p class="text-muted">No comments yet. Be the first to share your thoughts!</p>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="bg-dark text-light py-4 mt-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6 text-md-end">
+                    <p>&copy; 2025 Art sharing platform.</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap & jQuery & Swiper -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/swiper@9/swiper-bundle.min.js"></script>
+
+    <script>
+        $(document).ready(function() {
+            // 初始化 Swiper
+            var swiper = new Swiper(".mySwiper", {
+                slidesPerView: 1,
+                spaceBetween: 30,
+                loop: true,
+                pagination: {
+                    el: ".swiper-pagination",
+                    clickable: true,
+                },
+                navigation: {
+                    nextEl: ".swiper-button-next",
+                    prevEl: ".swiper-button-prev",
+                },
+                breakpoints: {
+                    640: {
+                        slidesPerView: 2,
+                        spaceBetween: 20,
+                    },
+                    768: {
+                        slidesPerView: 3,
+                        spaceBetween: 30,
+                    },
+                },
+            });
+
+            // 点赞功能
+            $('#likeButton').click(function() {
+                const $btn = $(this);
+                const artworkId = $btn.data('artwork-id');
+
+                if ($btn.attr('disabled')) {
+                    window.location.href = "{{ url_for('login') }}";
+                    return;
+                }
+
+                $.ajax({
+                    url: '/api/artwork/' + artworkId + '/like',
+                    type: 'POST',
+                    success: function(response) {
+                        if (response.success) {
+                            const $icon = $btn.find('i');
+                            const $count = $btn.find('.likes-count');
+
+                            if (response.liked) {
+                                $btn.addClass('liked');
+                                $icon.addClass('liked');
+                            } else {
+                                $btn.removeClass('liked');
+                                $icon.removeClass('liked');
+                            }
+
+                            $count.text(response.likes_count);
+                        }
+                    },
+                    error: function(xhr) {
+                        console.error('Like failed:', xhr.responseJSON?.error);
+                        alert('Operation failed, please try again');
+                    }
+                });
+            });
+
+            // 提交评论
+            $('#commentForm').submit(function(e) {
+                e.preventDefault();
+
+                const text = $('#commentText').val().trim();
+                if (!text) {
+                    alert('Please enter comment text');
+                    return;
+                }
+
+                const artworkId = "{{ artwork._id }}";
+
+                $.ajax({
+                    url: '/api/artwork/' + artworkId + '/comment',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({ text: text }),
+                    success: function(response) {
+                        if (response.success) {
+                            $('#commentText').val('');
+                            location.reload(); // 简单重新加载页面显示新评论
+                        }
+                    },
+                    error: function(xhr) {
+                        console.error('Comment failed:', xhr.responseJSON?.error);
+                        alert('Failed to post comment, please try again');
+                    }
+                });
+            });
+
+            // 删除评论
+            $('.delete-comment').click(function(e) {
+                e.preventDefault();
+                const commentId = $(this).data('comment-id');
+
+                if (!confirm('Are you sure you want to delete this comment?')) {
+                    return;
+                }
+
+                $.ajax({
+                    url: '/api/comment/' + commentId + '/delete',
+                    type: 'DELETE',
+                    success: function(response) {
+                        if (response.success) {
+                            $('#comment-' + commentId).remove();
+                            // 更新评论计数
+                            const commentCount = $('#commentsList .comment').length;
+                            $('.badge.bg-primary').text(commentCount);
+                        } else {
+                            alert('Failed to delete comment: ' + response.error);
+                        }
+                    },
+                    error: function(xhr) {
+                        console.error('Delete comment failed:', xhr.responseJSON?.error);
+                        alert('Failed to delete comment, please try again');
+                    }
+                });
+            });
+
+            // 编辑评论
+            $('.edit-comment').click(function(e) {
+                e.preventDefault();
+                const commentId = $(this).data('comment-id');
+                const commentElement = $('#comment-' + commentId);
+                const currentText = commentElement.find('.comment-text').text().trim();
+
+                const newText = prompt('Edit your comment:', currentText);
+                if (newText !== null && newText.trim() !== '' && newText !== currentText) {
+                    $.ajax({
+                        url: '/api/comment/' + commentId + '/edit',
+                        type: 'PUT',
+                        contentType: 'application/json',
+                        data: JSON.stringify({ text: newText.trim() }),
+                        success: function(response) {
+                            if (response.success) {
+                                commentElement.find('.comment-text').text(newText.trim());
+                                // 添加编辑标记
+                                if (!commentElement.find('.text-muted:contains("(edited)")').length) {
+                                    commentElement.find('small.text-muted').first().after(' <small class="text-muted">(edited)</small>');
+                                }
+                            } else {
+                                alert('Failed to edit comment: ' + response.error);
+                            }
+                        },
+                        error: function(xhr) {
+                            console.error('Edit comment failed:', xhr.responseJSON?.error);
+                            alert('Failed to edit comment, please try again');
+                        }
+                    });
+                }
+            });
+
+            // 复制链接功能
+            // $('.btn-outline-secondary').click(function() {
+             //    const url = window.location.href;
+             //    navigator.clipboard.writeText(url).then(function() {
+               //      alert('Link copied to clipboard!');
+               //  });
+            // });
+        });
+    </script>
+</body>
+</html>

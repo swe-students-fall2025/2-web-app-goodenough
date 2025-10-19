@@ -1,26 +1,18 @@
-from flask import Flask, render_template, request, redirect, url_for, flash, jsonify
+from flask import Flask, render_template, request, redirect, url_for, flash, session, jsonify
 from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
 from bson.objectid import ObjectId
-from datetime import datetime, timezone
 import os
 from dotenv import load_dotenv
 
-#Import database collections
 from db import users_collection, artworks_collection, comments_collection, likes_collection
-
-#Import model functions (some not finished rn)
-from models.user import add_user, get_all_users, get_user_by_email, get_user_by_id, update_user
-from models.artwork import add_artwork, get_all_artworks, search_artworks, update_artwork, delete_artwork, get_artwork_by_id, get_artworks_by_artist, filter_artworks
-from models.comment import add_comment, get_comments_by_artwork, delete_comment
-from models.like import add_like, remove_like, get_likes_count, user_has_liked
+from datetime import datetime, timezone
 
 load_dotenv()
 
 app = Flask(__name__)
-app.secret_key = os.getenv('SECRET_KEY', 'your-secret-key-here')
+app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'dev')
 
-#Flask-Login setup
 login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'login'
@@ -31,39 +23,79 @@ class User(UserMixin):
         self.username = user_data['username']
         self.email = user_data['email']
         self.bio = user_data.get('bio', '')
-        self.profile_image = user_data.get('profile_image', '')
+        self.profile_image = user_data.get('profile_image', '/static/images/profile.png')
         self.banner_image = user_data.get('banner_image', '')
         self.social_links = user_data.get('social_links', {})
 
 @login_manager.user_loader
 def load_user(user_id):
-    user_data = get_user_by_id(user_id)
-    if user_data:
-        return User(user_data)
+    try:
+        user_data = users_collection.find_one({"_id": ObjectId(user_id)})
+        if user_data:
+            return User(user_data)
+    except:
+        pass
     return None
 
-#Routes
+def get_user_by_email(email):
+    return users_collection.find_one({"email": email})
+
+def get_user_by_id(user_id):
+    try:
+        return users_collection.find_one({"_id": ObjectId(user_id)})
+    except:
+        return None
+
+def get_artwork_by_id(artwork_id):
+    try:
+        return artworks_collection.find_one({"_id": ObjectId(artwork_id)})
+    except:
+        return None
+
 @app.route('/')
-def home():
-    artworks = get_all_artworks()
+def index():
+    artworks = list(artworks_collection.find().sort("created_at", -1))
+    
+    for artwork in artworks:
+        artwork['artist'] = get_user_by_id(artwork['artist_id'])
+        artwork['likes_count'] = likes_collection.count_documents({"artwork_id": artwork['_id']})
+        artwork['comments_count'] = comments_collection.count_documents({"artwork_id": artwork['_id']})
+        if current_user.is_authenticated:
+            artwork['user_liked'] = likes_collection.find_one({
+                "artwork_id": artwork['_id'], 
+                "user_id": ObjectId(current_user.id)
+            }) is not None
+    
     return render_template('home.html', artworks=artworks)
 
 @app.route('/signup', methods=['GET', 'POST'])
 def signup():
+    """User registration"""
     if request.method == 'POST':
         username = request.form.get('username')
         email = request.form.get('email')
         password = request.form.get('password')
         
-        #Check if user already exists
-        existing_user = get_user_by_email(email)
-        if existing_user:
-            flash('Email already registered. Please log in.', 'error')
+        if not username or not email or not password:
+            flash('All fields are required', 'error')
             return redirect(url_for('signup'))
         
-        # Hash password and create user
+        if get_user_by_email(email):
+            flash('Email already registered', 'error')
+            return redirect(url_for('signup'))
+        
         password_hash = generate_password_hash(password)
-        add_user(username, email, password_hash)
+        user_data = {
+            "username": username,
+            "email": email,
+            "password_hash": password_hash,
+            "bio": "",
+            "profile_image": "/static/images/profile.png",
+            "banner_image": "",
+            "social_links": {},
+            "created_at": datetime.now(timezone.utc)
+        }
+        users_collection.insert_one(user_data)
         
         flash('Account created successfully! Please log in.', 'success')
         return redirect(url_for('login'))
@@ -72,8 +104,9 @@ def signup():
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
-    if request.method== 'POST':
-        email =request.form.get('email')
+    """User login"""
+    if request.method == 'POST':
+        email = request.form.get('email')
         password = request.form.get('password')
         
         user_data = get_user_by_email(email)
@@ -82,45 +115,55 @@ def login():
             user = User(user_data)
             login_user(user)
             flash('Logged in successfully!', 'success')
-            return redirect(url_for('home'))
+            return redirect(url_for('index'))
         else:
-            flash('Invalid email or password.', 'error')
-            return redirect(url_for('login'))
+            flash('Invalid email or password', 'error')
     
     return render_template('login.html')
 
 @app.route('/logout')
 @login_required
 def logout():
+    """User logout"""
     logout_user()
-    flash('Logged out successfully.', 'success')
-    return redirect(url_for('home'))
+    flash('Logged out successfully', 'success')
+    return redirect(url_for('index'))
 
 @app.route('/profile/<user_id>')
 def profile(user_id):
+    """View user profile"""
     user_data = get_user_by_id(user_id)
     if not user_data:
-        flash('User not found.', 'error')
-        return redirect(url_for('home'))
+        flash('User not found', 'error')
+        return redirect(url_for('index'))
     
-    artworks = get_artworks_by_artist(user_id)
+    artworks = list(artworks_collection.find({"artist_id": user_id}).sort("created_at", -1))
+    
+    for artwork in artworks:
+        artwork['likes_count'] = likes_collection.count_documents({"artwork_id": artwork['_id']})
+        artwork['comments_count'] = comments_collection.count_documents({"artwork_id": artwork['_id']})
+    
     return render_template('profile.html', user=user_data, artworks=artworks)
 
 @app.route('/profile/edit', methods=['GET', 'POST'])
 @login_required
 def edit_profile():
+    """Edit current user's profile"""
     if request.method == 'POST':
         update_data = {
             'bio': request.form.get('bio', ''),
-            'profile_image': request.form.get('profile_image', ''),
             'banner_image': request.form.get('banner_image', ''),
+            'profile_image': request.form.get('profile_image', '/static/images/profile.png'),
             'social_links': {
                 'instagram': request.form.get('instagram', ''),
                 'twitter': request.form.get('twitter', ''),
                 'website': request.form.get('website', '')
             }
         }
-        update_user(current_user.id, update_data)
+        users_collection.update_one(
+            {"_id": ObjectId(current_user.id)},
+            {"$set": update_data}
+        )
         flash('Profile updated successfully!', 'success')
         return redirect(url_for('profile', user_id=current_user.id))
     
@@ -130,29 +173,31 @@ def edit_profile():
 @app.route('/artwork/add', methods=['GET', 'POST'])
 @login_required
 def add_artwork_route():
+    """Add new artwork"""
     if request.method == 'POST':
         title = request.form.get('title')
         description = request.form.get('description')
         image_url = request.form.get('image_url')
-        tags = request.form.get('tags', '').split(',')
-        tags = [tag.strip() for tag in tags if tag.strip()]
-        medium = request.form.get('medium', '')
-        year = request.form.get('year', '')
-        price = request.form.get('price', '')
-        process_images = request.form.get('process_images', '').split(',')
-        process_images = [img.strip() for img in process_images if img.strip()]
+        tags = [tag.strip() for tag in request.form.get('tags', '').split(',') if tag.strip()]
+        medium = request.form.get('medium')
+        year = request.form.get('year', type=int)
+        price = request.form.get('price', type=float)
+        process_images = [img.strip() for img in request.form.get('process_images', '').split(',') if img.strip()]
         
-        add_artwork(
-            current_user.id, 
-            title, 
-            description, 
-            image_url, 
-            tags,
-            medium,
-            year,
-            price,
-            process_images
-        )
+        artwork_data = {
+            "artist_id": current_user.id,
+            "title": title,
+            "description": description,
+            "image_url": image_url,
+            "tags": tags,
+            "medium": medium,
+            "year": year,
+            "price": price,
+            "process_images": process_images,
+            "created_at": datetime.now(timezone.utc)
+        }
+        artworks_collection.insert_one(artwork_data)
+        
         flash('Artwork added successfully!', 'success')
         return redirect(url_for('profile', user_id=current_user.id))
     
@@ -160,15 +205,25 @@ def add_artwork_route():
 
 @app.route('/artwork/<artwork_id>')
 def artwork_detail(artwork_id):
+    """View artwork details"""
     artwork = get_artwork_by_id(artwork_id)
     if not artwork:
-        flash('Artwork not found.', 'error')
-        return redirect(url_for('home'))
+        flash('Artwork not found', 'error')
+        return redirect(url_for('index'))
     
     artist = get_user_by_id(artwork['artist_id'])
-    comments = get_comments_by_artwork(artwork_id)
-    likes_count = get_likes_count(artwork_id)
-    user_liked = user_has_liked(artwork_id, current_user.id) if current_user.is_authenticated else False
+    comments = list(comments_collection.find({"artwork_id": ObjectId(artwork_id)}).sort("created_at", 1))
+    
+    for comment in comments:
+        comment['user'] = get_user_by_id(str(comment['user_id']))
+    
+    likes_count = likes_collection.count_documents({"artwork_id": ObjectId(artwork_id)})
+    user_liked = False
+    if current_user.is_authenticated:
+        user_liked = likes_collection.find_one({
+            "artwork_id": ObjectId(artwork_id),
+            "user_id": ObjectId(current_user.id)
+        }) is not None
     
     return render_template('artwork_detail.html', 
                          artwork=artwork, 
@@ -180,14 +235,12 @@ def artwork_detail(artwork_id):
 @app.route('/artwork/<artwork_id>/edit', methods=['GET', 'POST'])
 @login_required
 def edit_artwork(artwork_id):
+    """Edit artwork"""
     artwork = get_artwork_by_id(artwork_id)
-    if not artwork:
-        flash('Artwork not found.', 'error')
-        return redirect(url_for('home'))
     
-    if artwork['artist_id'] != current_user.id:
-        flash('You can only edit your own artworks.', 'error')
-        return redirect(url_for('artwork_detail', artwork_id=artwork_id))
+    if not artwork or str(artwork['artist_id']) != current_user.id:
+        flash('Unauthorized access', 'error')
+        return redirect(url_for('index'))
     
     if request.method == 'POST':
         update_data = {
@@ -195,12 +248,15 @@ def edit_artwork(artwork_id):
             'description': request.form.get('description'),
             'image_url': request.form.get('image_url'),
             'tags': [tag.strip() for tag in request.form.get('tags', '').split(',') if tag.strip()],
-            'medium': request.form.get('medium', ''),
-            'year': request.form.get('year', ''),
-            'price': request.form.get('price', ''),
+            'medium': request.form.get('medium'),
+            'year': request.form.get('year', type=int),
+            'price': request.form.get('price', type=float),
             'process_images': [img.strip() for img in request.form.get('process_images', '').split(',') if img.strip()]
         }
-        update_artwork(artwork_id, update_data)
+        artworks_collection.update_one(
+            {"_id": ObjectId(artwork_id)},
+            {"$set": update_data}
+        )
         flash('Artwork updated successfully!', 'success')
         return redirect(url_for('artwork_detail', artwork_id=artwork_id))
     
@@ -209,62 +265,143 @@ def edit_artwork(artwork_id):
 @app.route('/artwork/<artwork_id>/delete', methods=['POST'])
 @login_required
 def delete_artwork_route(artwork_id):
+    """Delete artwork"""
     artwork = get_artwork_by_id(artwork_id)
-    if not artwork:
-        flash('Artwork not found.', 'error')
-        return redirect(url_for('home'))
     
-    if artwork['artist_id'] != current_user.id:
-        flash('You can only delete your own artworks.', 'error')
-        return redirect(url_for('artwork_detail', artwork_id=artwork_id))
+    if not artwork or str(artwork['artist_id']) != current_user.id:
+        flash('Unauthorized access', 'error')
+        return redirect(url_for('index'))
     
-    delete_artwork(artwork_id)
+    artworks_collection.delete_one({"_id": ObjectId(artwork_id)})
     flash('Artwork deleted successfully!', 'success')
     return redirect(url_for('profile', user_id=current_user.id))
 
 @app.route('/search')
 def search():
+    """Search artworks"""
     keyword = request.args.get('q', '')
     medium = request.args.get('medium', '')
-    year = request.args.get('year', '')
+    year = request.args.get('year', type=int)
+    
+    query = {}
     
     if keyword:
-        artworks = search_artworks(keyword)
-    else:
-        artworks = filter_artworks(medium, year)
+        query = {"$or": [
+            {"title": {"$regex": keyword, "$options": "i"}},
+            {"description": {"$regex": keyword, "$options": "i"}},
+            {"tags": {"$regex": keyword, "$options": "i"}}
+        ]}
     
-    return render_template('search.html', artworks=artworks, keyword=keyword, medium=medium, year=year)
+    if medium:
+        query["medium"] = medium
+    if year:
+        query["year"] = year
+    
+    artworks = list(artworks_collection.find(query))
+    
+    for artwork in artworks:
+        artwork['artist'] = get_user_by_id(artwork['artist_id'])
+        artwork['likes_count'] = likes_collection.count_documents({"artwork_id": artwork['_id']})
+    
+    return render_template('search_results.html', artworks=artworks, query=keyword)
 
-@app.route('/artwork/<artwork_id>/comment', methods=['POST'])
+@app.route('/api/artwork/<artwork_id>/like', methods=['POST'])
+@login_required
+def toggle_like(artwork_id):
+    """Toggle like on artwork"""
+    try:
+        artwork_obj_id = ObjectId(artwork_id)
+        user_obj_id = ObjectId(current_user.id)
+        
+        existing_like = likes_collection.find_one({
+            "artwork_id": artwork_obj_id,
+            "user_id": user_obj_id
+        })
+        
+        if existing_like:
+            likes_collection.delete_one({"_id": existing_like['_id']})
+            liked = False
+        else:
+            likes_collection.insert_one({
+                "artwork_id": artwork_obj_id,
+                "user_id": user_obj_id,
+                "created_at": datetime.now(timezone.utc)
+            })
+            liked = True
+        
+        likes_count = likes_collection.count_documents({"artwork_id": artwork_obj_id})
+        return jsonify({'success': True, 'liked': liked, 'likes_count': likes_count})
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 400
+
+@app.route('/api/artwork/<artwork_id>/comment', methods=['POST'])
 @login_required
 def add_comment_route(artwork_id):
-    content = request.form.get('content')
-    if content:
-        add_comment(artwork_id, current_user.id, content)
-        flash('Comment added successfully!', 'success')
-    return redirect(url_for('artwork_detail', artwork_id=artwork_id))
+    """Add comment to artwork"""
+    try:
+        text = request.json.get('text')
+        
+        if not text:
+            return jsonify({'success': False, 'error': 'Comment text required'}), 400
+        
+        comment_data = {
+            "artwork_id": ObjectId(artwork_id),
+            "user_id": ObjectId(current_user.id),
+            "text": text,
+            "created_at": datetime.now(timezone.utc),
+            "updated_at": None
+        }
+        result = comments_collection.insert_one(comment_data)
+        return jsonify({'success': True, 'comment_id': str(result.inserted_id)})
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 400
 
-@app.route('/comment/<comment_id>/delete', methods=['POST'])
+@app.route('/api/comment/<comment_id>/edit', methods=['PUT'])
+@login_required
+def edit_comment(comment_id):
+    """Edit comment"""
+    try:
+        new_text = request.json.get('text')
+        
+        if not new_text:
+            return jsonify({'success': False, 'error': 'Comment text required'}), 400
+        
+        result = comments_collection.update_one(
+            {"_id": ObjectId(comment_id), "user_id": ObjectId(current_user.id)},
+            {"$set": {"text": new_text, "updated_at": datetime.now(timezone.utc)}}
+        )
+        
+        if result.modified_count > 0:
+            return jsonify({'success': True})
+        else:
+            return jsonify({'success': False, 'error': 'Unauthorized or comment not found'}), 403
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 400
+
+@app.route('/api/comment/<comment_id>/delete', methods=['DELETE'])
 @login_required
 def delete_comment_route(comment_id):
-    comment = comments_collection.find_one({'_id': ObjectId(comment_id)})
-    if comment and comment['user_id'] == current_user.id:
-        delete_comment(comment_id)
-        flash('Comment deleted successfully!', 'success')
-    return redirect(request.referrer or url_for('home'))
+    """Delete comment"""
+    try:
+        result = comments_collection.delete_one({
+            "_id": ObjectId(comment_id),
+            "user_id": ObjectId(current_user.id)
+        })
+        
+        if result.deleted_count > 0:
+            return jsonify({'success': True})
+        else:
+            return jsonify({'success': False, 'error': 'Unauthorized or comment not found'}), 403
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 400
 
-@app.route('/artwork/<artwork_id>/like', methods=['POST'])
-@login_required
-def like_artwork(artwork_id):
-    if user_has_liked(artwork_id, current_user.id):
-        remove_like(artwork_id, current_user.id)
-        liked = False
-    else:
-        add_like(artwork_id, current_user.id)
-        liked = True
-    
-    likes_count = get_likes_count(artwork_id)
-    return jsonify({'liked': liked, 'likes_count': likes_count})
+@app.errorhandler(404)
+def not_found(e):
+    return render_template('404.html'), 404
+
+@app.errorhandler(500)
+def internal_error(e):
+    return render_template('500.html'), 500
 
 if __name__ == '__main__':
     app.run(debug=True)

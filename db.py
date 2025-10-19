@@ -3,13 +3,19 @@ import os
 from dotenv import load_dotenv
 
 load_dotenv()
-MONGO_URI = os.getenv("MONGO_URI")
-MONGO_DBNAME = os.getenv("MONGO_DBNAME")
+MONGO_URI = os.getenv("MONGO_URI", "mongodb://127.0.0.1:27017")
+DB_NAME = os.getenv("DB_NAME", "enoughart")
 
-client = MongoClient(MONGO_URI)
-db = client[MONGO_DBNAME]
+_client = MongoClient(MONGO_URI)
+_db = _client[DB_NAME]
 
-users_collection = db['users']
-artworks_collection = db['artworks']
-comments_collection = db['comments']
-likes_collection = db['likes']
+users_collection = _db.get_collection("users")
+artworks_collection = _db.get_collection("artworks")
+comments_collection = _db.get_collection("comments")
+likes_collection = _db.get_collection("likes")
+
+def get_db():
+    return _db
+
+def get_client():
+    return _client
