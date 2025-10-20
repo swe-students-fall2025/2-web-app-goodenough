@@ -17,8 +17,26 @@
                         </a>
                     </li>
                     <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown">
-                            {{ current_user.username }}
+                        <a class="nav-link dropdown-toggle d-flex align-items-center"
+                           href="#"
+                           id="navbarDropdown"
+                           role="button"
+                           data-bs-toggle="dropdown"
+                           aria-expanded="false">
+
+                            <span class="order-1">{{ current_user.username }}</span>
+
+                            {% if current_user.profile_image %}
+                                <img src="{{ current_user.profile_image }}"
+                                     alt="Profile"
+                                     class="rounded-circle ms-2 order-2"
+                                     width="30" height="30">
+                            {% else %}
+                                <img src="{{ url_for('static', filename='images/default_avatar.png') }}"
+                                     alt="Profile"
+                                     class="rounded-circle ms-2 order-2"
+                                     width="30" height="30">
+                            {% endif %}
                         </a>
                         <ul class="dropdown-menu">
                             <li><a class="dropdown-item" href="{{ url_for('profile', user_id=current_user.id) }}">My Homepage</a></li>
