@@ -26,7 +26,7 @@
 
         <!-- 预览区域 -->
         <div class="preview-container">
-            <div id="bannerPreviewContainer" style="display: none;">
+            <div id="bannerPreviewContainer">
                 {% if user.banner_image %}
                 <img src="{{ user.banner_image }}" alt="Banner preview" class="banner-preview" id="bannerPreview">
                 {% else %}
@@ -48,8 +48,7 @@
             <div class="form-card">
                 <!-- 步骤指示器 -->
                 <div class="step-indicator step-active">
-                    <div class="step-number">1</div>
-                    <span>Profile Images</span>
+                    <span>Profile Image</span>
                 </div>
 
                 <!-- Banner URL -->
@@ -72,11 +71,6 @@
             </div>
 
             <div class="form-card">
-                <div class="step-indicator step-active">
-                    <div class="step-number">2</div>
-                    <span>Personal Information</span>
-                </div>
-
                 <!-- Bio -->
                 <div class="mb-3">
                     <label for="bio" class="form-label">Bio</label>
@@ -88,7 +82,6 @@
 
             <div class="form-card">
                 <div class="step-indicator">
-                    <div class="step-number">3</div>
                     <span>Social Links</span>
                 </div>
 
