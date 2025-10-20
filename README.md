@@ -30,8 +30,6 @@ It's a simple, mobile-friendly web app that allows users to browse, add, edit, a
 - As an artist, I want to edit existing artwork information to keep the gallery up to date
 - As an artist, I want to delete artworks that are no longer available
 - As an artist, I want all artwork data to be securely stored and retrieved from MongoDb, so that information is not lost between sessions and can scale with user traffic.
-- As an artist, I want to receive notifications when someone likes or comments on my artwork, so I can interact with my audience in real time.
-- As an artist, I want to view analytics on my artwork (likes, comments, and views), so I can understand audience engagement.
 - As a user, I want to "like" an artwork, so I can show appreciation for the artist's work.
 - As a user, I want to post comments or ask questions on an artwork's detail page, so I can engage with the artist.
 - As a user, I want to browse all artworks in the gallery so I can discover new art
@@ -39,9 +37,7 @@ It's a simple, mobile-friendly web app that allows users to browse, add, edit, a
 - As a user, I want to filter artworks by year created or artistic medium, so that I can explore specific time periods or styles.
 - As a user, I want to view an artwork's process using a slider, so I can easily scrub through the creation steps.
 - As a user, I want to see a preview of the process on the homepage so that I can get a glimpse before clicking.
-- As a user, I want to follow my favorite artists, so I can stay updated when they upload new artworks.
-- As a user, I want to save artworks to a personal favorites list, so I can easily revisit pieces I love later.
-- As a user, I want to share artworks directly to social media platforms, so I can promote artists I admire.
+- As a user, I want to share my social media platforms, so I can promote myself more for people who like my art.
 
 
 
