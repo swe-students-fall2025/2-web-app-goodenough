@@ -22,7 +22,6 @@
             
             <!-- Overlay container for username and edit button -->
             <div class="position-absolute top-0 start-0 w-100 h-100 d-flex flex-column justify-content-center align-items-center">
-                <h2 class="text-white fw-bold" style="font-size: 50px; text-shadow: 2px 2px 4px rgba(0,0,0,0.7);">{{ user.username }}</h2>
 
                 {% if current_user.is_authenticated and current_user.id == user._id|string %}
                 <div class="position-absolute top-0 end-0 m-3">
@@ -39,17 +38,27 @@
             <div class="row">
                 <!-- 左侧：个人信息 -->
                 <!-- Username and Bio row above everything -->
-            <div class="row mb-4">
-                <div class="col-12 text-center">
-                    <h1 class="h2 mb-2">{{ user.username }}</h1>
-
-                    {% if user.bio %}
-                    <p class="text-muted mb-3">{{ user.bio }}</p>
-                    {% else %}
-                    <p class="text-muted mb-3 fst-italic">This artist hasn't written a bio yet.</p>
-                    {% endif %}
+                <div class="row mb-5 align-items-center">
+                    <div class="col-lg-5 d-flex align-items-center">
+                        {% if user.profile_image %}
+                            <img src="{{ user.profile_image }}" 
+                                 alt="Profile" 
+                                 class="rounded-circle me-4" 
+                                 width="150" height="150" 
+                                 style="object-fit: cover; border: 3px solid #ddd;">
+                        {% endif %}
+                        <div>
+                            <h1 class="fw-bold mb-2" style="font-size: 1.8rem;">{{ user.username }}</h1>
+                            {% if user.bio %}
+                                <p class="text-muted mb-0" style="font-size: 1.05rem;">{{ user.bio }}</p>
+                            {% else %}
+                                <p class="text-muted mb-0 fst-italic" style="font-size: 1.05rem;">
+                                    This artist hasn't written a bio yet.
+                                </p>
+                            {% endif %}
+                        </div>
+                    </div>
                 </div>
-            </div>
 
             <div class="row">
                 <!-- 左侧：个人信息 -->
