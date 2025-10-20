@@ -75,5 +75,9 @@ flask --app app run --debug
 ```
 ## Task boards
 
-### https://github.com/orgs/swe-students-fall2025/projects/21
-### https://github.com/orgs/swe-students-fall2025/projects/61
+### Sprint1
+[GitHub Project Board 1](https://github.com/orgs/swe-students-fall2025/projects/21)
+
+### Sprint2
+[GitHub Project Board 2](https://github.com/orgs/swe-students-fall2025/projects/61)
+
