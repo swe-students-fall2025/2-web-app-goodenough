@@ -15,15 +15,15 @@
     <!-- 个人主页内容 -->
     <div class="container-fluid px-0">
         <!-- Banner区域 -->
-        <div class="profile-banner">
-              <!--{% if user.banner_image %}
-            <img src="{{ user.banner_image }}" alt="Banner">
-            {% endif %} -->
-            <div class="container position-relative h-100">
-                <!-- 头像 -->
-            <h2 style="text-align: center;line-height: 250px;font-weight: bold;color: #fff;font-size: 50px;">{{ user.username }}</h2>
+        <div class="profile-banner position-relative">
+            {% if user.banner_image %}
+            <img src="{{ user.banner_image }}" alt="Banner" class="w-100" style="height: 300px; object-fit: cover;">
+            {% endif %}
+            
+            <!-- Overlay container for username and edit button -->
+            <div class="position-absolute top-0 start-0 w-100 h-100 d-flex flex-column justify-content-center align-items-center">
+                <h2 class="text-white fw-bold" style="font-size: 50px; text-shadow: 2px 2px 4px rgba(0,0,0,0.7);">{{ user.username }}</h2>
 
-                <!-- 编辑按钮（仅本人可见） -->
                 {% if current_user.is_authenticated and current_user.id == user._id|string %}
                 <div class="position-absolute top-0 end-0 m-3">
                     <a href="{{ url_for('edit_profile') }}" class="btn btn-light">
@@ -33,6 +33,7 @@
                 {% endif %}
             </div>
         </div>
+
 
         <div class="container">
             <div class="row">

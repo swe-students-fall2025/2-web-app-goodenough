@@ -18,14 +18,11 @@
     margin: 0;
     padding: 0;
 }
-
-body.logsign-page {
-    --bg-color: #202123;
-    --container-bg: #343541;
-    --text-primary: #ffffff;
-    --text-secondary: #b4b4b4;
-    --border-color: #565869;
+footer {
+    margin-top: auto; /* pushes footer to bottom */
+    width: 100%;
 }
+
 
 body.home-page {
     display: flex;
@@ -40,22 +37,26 @@ body.home-page > .container {
     flex: 1; /* pushes footer to the bottom */
 }
 
-/* login/signup */
+
 body.logsign-page {
+    --bg-color: #202123;
+    --container-bg: #343541;
+    --text-primary: #ffffff;
+    --text-secondary: #b4b4b4;
+    --border-color: #565869;
+    --button-bg: #4b4b4b;
+    --button-text: #ffffff;
+    --button-hover-bg: #565869;
+
     display: flex;
     justify-content: center;
     align-items: center;
     min-height: 100vh;
     padding: 1rem;
+    background-color: var(--bg-color);
 }
 
-footer {
-    margin-top: auto; /* pushes footer to bottom */
-    width: 100%;
-}
-
-
-.logsign-wrapper {
+body.logsign-page .logsign-wrapper {
     width: 100%;
     max-width: 450px;
     padding: 2.5rem;
@@ -65,17 +66,18 @@ footer {
     box-shadow: 0 4px 12px rgba(0,0,0,0.3);
 }
 
-.logsign-header h1 {
+body.logsign-page .logsign-header h1 {
     font-size: 2rem;
     font-weight: 700;
     margin-bottom: 2.5rem;
+    color: var(--text-primary);
 }
 
-.form-field {
+body.logsign-page .form-field {
     margin-bottom: 1.5rem;
 }
 
-.form-field input {
+body.logsign-page .form-field input {
     width: 100%;
     padding: 14px 16px;
     font-size: 1rem;
@@ -87,15 +89,15 @@ footer {
     transition: border-color 0.2s;
 }
 
-.form-field input::placeholder {
+body.logsign-page .form-field input::placeholder {
     color: var(--text-secondary);
 }
 
-.form-field input:focus {
+body.logsign-page .form-field input:focus {
     border-color: var(--text-primary);
 }
 
-.logsign-button {
+body.logsign-page .logsign-button {
     width: 100%;
     padding: 14px;
     font-size: 1rem;
@@ -109,22 +111,22 @@ footer {
     margin-top: 1rem;
 }
 
-.logsign-button:hover {
+body.logsign-page .logsign-button:hover {
     background-color: var(--button-hover-bg);
 }
 
-.switch-form-link {
+body.logsign-page .switch-form-link {
     margin-top: 2rem;
     font-size: 0.9rem;
 }
 
-.switch-form-link a {
+body.logsign-page .switch-form-link a {
     color: var(--text-primary);
     text-decoration: underline;
     font-weight: 500;
 }
 
-.switch-form-link a:hover {
+body.logsign-page .switch-form-link a:hover {
     text-decoration: none;
 }
 
