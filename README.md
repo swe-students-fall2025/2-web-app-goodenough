@@ -75,4 +75,5 @@ flask --app app run --debug
 ```
 ## Task boards
 
-https://github.com/orgs/swe-students-fall2025/projects/21
+### https://github.com/orgs/swe-students-fall2025/projects/21
+### https://github.com/orgs/swe-students-fall2025/projects/61
