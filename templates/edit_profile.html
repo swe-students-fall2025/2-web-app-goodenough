@@ -10,6 +10,7 @@
 </head>
 
 <body class="edit-profilebody">
+    {% include 'navbar.html' %}
   <div class="profile-edit-container">
     <div class="banner-wrapper" id="bannerPreviewContainer">
       {% if user.banner_image %}
@@ -113,5 +114,6 @@
       });
     });
   </script>
+  {% include 'footer.html' %}
 </body>
 </html>
