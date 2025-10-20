@@ -38,12 +38,6 @@
         <!-- 表单 -->
         <form method="POST" enctype="multipart/form-data" id="artworkForm">
             <div class="form-card">
-                <!-- 步骤指示器 -->
-                <div class="step-indicator step-active">
-                    <div class="step-number">1</div>
-                    <span>Basic Information</span>
-                </div>
-
                 <!-- 标题 -->
                 <div class="mb-3">
                     <label for="title" class="form-label">Title *</label>
@@ -58,9 +52,6 @@
                     <input type="url" class="form-control" id="image_url" name="image_url"
                            value="{{ artwork.image_url if artwork }}"
                            placeholder="https://example.com/image.jpg" required>
-                    <div class="form-text">Provide a direct link to your artwork image</div>
-                    <!-- 图片预览 -->
-                    <img id="imagePreview" class="preview-image" alt="Image preview">
                 </div>
 
                 <!-- 描述 -->
@@ -73,7 +64,6 @@
 
             <div class="form-card">
                 <div class="step-indicator step-active">
-                    <div class="step-number">2</div>
                     <span>Artwork Details</span>
                 </div>
 
@@ -143,7 +133,6 @@
 
             <div class="form-card">
                 <div class="step-indicator">
-                    <div class="step-number">3</div>
                     <span>Process Images (Optional)</span>
                 </div>
 
@@ -151,8 +140,9 @@
                 <div class="mb-3">
                     <label for="process_images" class="form-label">Process Images URLs</label>
                     <textarea class="form-control" id="process_images" name="process_images" rows="3"
-                              placeholder="Enter URLs for process images, one per line">{{ artwork.process_images|join('\n') if artwork and artwork.process_images }}</textarea>
-                    <div class="form-text">Add URLs showing your creative process (one URL per line)</div>
+                        placeholder="Enter URLs for process images"
+                        oninput="updateProcessImagesPreview()">{{ artwork.process_images|join('\n') if artwork and artwork.process_images }}</textarea>
+                    <div class="form-text">Add URLs showing your creative process (allows multiple please use commas to seperate)</div>
 
                     <!-- 过程图片预览 -->
                     <div id="processImagesPreview" class="image-preview-container mt-2">

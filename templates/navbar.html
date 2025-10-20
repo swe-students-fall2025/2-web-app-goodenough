@@ -1,4 +1,3 @@
-<!-- 导航栏 -->
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
     <div class="container">
         <a class="navbar-brand" href="{{ url_for('index') }}">
@@ -10,47 +9,6 @@
         </button>
 
         <div class="collapse navbar-collapse" id="navbarNav">
-            <!-- 搜索框 -->
-            <form class="d-flex search-box me-3" action="{{ url_for('search') }}" method="GET" id="searchForm">
-                <input class="form-control me-2" type="search" name="q" placeholder="Search for artworks..." aria-label="Search">
-                <button class="btn btn-outline-light" type="submit">
-                    <i class="fas fa-search"></i>
-                </button>
-            </form>
-
-            <!-- 筛选下拉菜单 -->
-            <div class="dropdown me-3">
-                <button class="btn btn-outline-light dropdown-toggle" type="button" id="filterDropdown" data-bs-toggle="dropdown">
-                    <i class="fas fa-filter"></i> Filters
-                </button>
-                <div class="dropdown-menu filter-dropdown" aria-labelledby="filterDropdown">
-                    <div class="p-3">
-                        <h6 class="dropdown-header">Filter Options</h6>
-                        <div class="mb-3">
-                            <label for="mediumFilter" class="form-label small">Medium</label>
-                            <select class="form-select form-select-sm" id="mediumFilter" name="medium">
-                                <option value="">All Mediums</option>
-                                <option value="Oil Painting">Oil Painting</option>
-                                <option value="Watercolor">Watercolor</option>
-                                <option value="Acrylic">Acrylic</option>
-                                <option value="Digital Art">Digital Art</option>
-                                <option value="Sculpture">Sculpture</option>
-                                <option value="Photography">Photography</option>
-                                <option value="Drawing">Drawing</option>
-                                <option value="Mixed Media">Mixed Media</option>
-                                <option value="Print">Print</option>
-                                <option value="Other">Other</option>
-                            </select>
-                        </div>
-                        <div class="mb-3">
-                            <label for="yearFilter" class="form-label small">Year</label>
-                            <input type="number" class="form-control form-control-sm" id="yearFilter" name="year" placeholder="e.g., 2023" min="1900" max="2030">
-                        </div>
-                        <button type="button" class="btn btn-primary btn-sm w-100" onclick="applyFilters()">Apply Filters</button>
-                    </div>
-                </div>
-            </div>
-
             <ul class="navbar-nav ms-auto">
                 {% if current_user.is_authenticated %}
                     <li class="nav-item">

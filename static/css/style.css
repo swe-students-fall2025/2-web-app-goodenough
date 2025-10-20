@@ -13,6 +13,7 @@
 }
 
 /* some global */
+
 * {
     box-sizing: border-box;
     margin: 0;
@@ -146,16 +147,20 @@ body.logsign-page .switch-form-link a:hover {
     margin-bottom: 2rem;
 }
 
-.preview-image, .process-image-preview {
-    border-radius: 8px;
-    object-fit: cover;
-}
 
 .image-preview-container {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
+    display: flex; 
+    flex-wrap: wrap; 
+    gap: 10px; 
     margin-top: 10px;
+}
+
+.process-image-preview {
+    width: 100px; 
+    height: 100px;
+    
+    border-radius: 8px;
+    object-fit: cover; 
 }
 
 /* Tags */
@@ -271,6 +276,15 @@ body.logsign-page .switch-form-link a:hover {
 }
 
 /* Artwork Cards */
+.artwork-card .card-text {
+    white-space: nowrap;      
+    overflow: hidden;         
+    text-overflow: ellipsis;  
+    font-size: 0.9rem;        
+    color: #6c757d;         
+    margin-bottom: 0.5rem;
+}
+
 .artwork-card {
     transition: transform 0.2s;
     margin-bottom: 2rem;
@@ -445,3 +459,134 @@ body.logsign-page .switch-form-link a:hover {
     font-weight: bold;
     border-bottom: 2px solid #007bff;
 }
+
+/* edit profile page css */
+body.edit-profilebody {
+  background-color: #f2f3f5;
+  font-family: "Inter", sans-serif;
+  color: #2e3338;
+}
+
+.profile-edit-container {
+  max-width: 700px;
+  margin: 60px auto;
+  background-color: #fff;
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+}
+
+.banner-wrapper {
+  position: relative;
+  height: 180px;
+  background-color: #d2d3d5;
+}
+
+.banner-wrapper img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.avatar-wrapper {
+  position: absolute;
+  bottom: -60px;
+  left: 40px;
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 6px solid #fff;
+  background-color: #e3e5e8;
+}
+
+.avatar-wrapper img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.profile-content {
+  padding: 80px 40px 40px;
+}
+
+.profile-content h3 {
+  font-weight: 600;
+  margin-bottom: 20px;
+}
+
+.form-label {
+  font-weight: 500;
+  color: #555;
+}
+
+.form-control {
+  border-radius: 10px;
+  border: 1px solid #ddd;
+  transition: all 0.2s ease;
+}
+
+.form-control:focus {
+  border-color: #5865f2;
+  box-shadow: 0 0 0 2px rgba(88, 101, 242, 0.2);
+}
+
+.section-divider {
+  border-top: 1px solid #eee;
+  margin: 30px 0;
+}
+
+.social-input {
+  display: flex;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.social-input .icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 10px;
+  color: #fff;
+  flex-shrink: 0;
+}
+
+.icon.website {
+  background: #6c757d;
+}
+.icon.instagram {
+  background: #e1306c;
+}
+.icon.twitter {
+  background: #1da1f2;
+}
+
+.btn-primary {
+  background-color: #5865f2;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 24px;
+  font-weight: 500;
+}
+
+.btn-primary:hover {
+  background-color: #4752c4;
+}
+
+.btn-outline-secondary {
+  border-radius: 8px;
+}
+
+@media (max-width: 576px) {
+  .avatar-wrapper {
+    left: 50%;
+    transform: translateX(-50%);
+  }
+  .profile-content {
+    padding: 100px 20px 40px;
+  }
+}
+

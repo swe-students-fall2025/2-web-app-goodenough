@@ -1,4 +1,3 @@
-<!-- templates/home.html -->
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
@@ -12,21 +11,61 @@
 </head>
 <body class="home-page">
     {% include 'navbar.html' %}
-    <!-- 主要内容 -->
-     {% set highlight_query = '' %}
+    {% set highlight_query = '' %}
     <div class="container mt-4">
-        <div class="row mb-4">
-            <div class="col">
-                <h1>Latest Artworks</h1>
-                <p class="text-muted">Explore exciting creations in the community</p>
+        
+        <div class="row mb-4 align-items-center custom-header-row">
+            <div class="col-12 col-md-4">
+                <h1 class="mb-0 page-title-header">Latest Artworks</h1>
+            </div>
+
+            <div class="col-12 col-md-5 mt-3 mt-md-0">
+                <form class="d-flex search-box" action="{{ url_for('search') }}" method="GET" id="searchForm">
+                    <input class="form-control me-2" type="search" name="q" placeholder="Search for artworks..." aria-label="Search">
+                    <button class="btn btn-primary" type="submit">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </form>
+            </div>
+
+            <div class="col-12 col-md-3 d-flex justify-content-md-end mt-3 mt-md-0">
+                <div class="dropdown w-100 w-md-auto">
+                    <button class="btn btn-outline-secondary dropdown-toggle w-100" type="button" id="filterDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="fas fa-filter"></i> Filters
+                    </button>
+                    <div class="dropdown-menu dropdown-menu-end filter-dropdown" aria-labelledby="filterDropdown">
+                        <div class="p-3">
+                            <h6 class="dropdown-header">Filter Options</h6>
+                            <div class="mb-3">
+                                <label for="mediumFilter" class="form-label small">Medium</label>
+                                <select class="form-select form-select-sm" id="mediumFilter" name="medium">
+                                    <option value="">All Mediums</option>
+                                    <option value="Oil Painting">Oil Painting</option>
+                                    <option value="Watercolor">Watercolor</option>
+                                    <option value="Acrylic">Acrylic</option>
+                                    <option value="Digital Art">Digital Art</option>
+                                    <option value="Sculpture">Sculpture</option>
+                                    <option value="Photography">Photography</option>
+                                    <option value="Drawing">Drawing</option>
+                                    <option value="Mixed Media">Mixed Media</option>
+                                    <option value="Print">Print</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label for="yearFilter" class="form-label small">Year</label>
+                                <input type="number" class="form-control form-control-sm" id="yearFilter" name="year" placeholder="e.g., 2023" min="1900" max="2030">
+                            </div>
+                            <button type="button" class="btn btn-primary btn-sm w-100" onclick="applyFilters()">Apply Filters</button>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
-
         <div class="row">
             {% if artworks %}
-                 {% include 'artwork_grid.html' %}
+                    {% include 'artwork_grid.html' %}
             {% else %}
-                <!-- 没有作品的提示 -->
                 <div class="col-12 text-center py-5">
                     <i class="fas fa-images fa-3x text-muted mb-3"></i>
                     <h3 class="text-muted">No artworks yet</h3>
@@ -46,7 +85,6 @@
     </div>
     {% include 'footer.html' %}
 
-    <!-- Bootstrap & jQuery -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="{{ url_for('static', filename='js/script.js') }}"></script>
