@@ -1,27 +1,47 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap');
 
 :root {
-    --bg-color: #202123;
-    --container-bg: #343541;
-    --text-primary: #ffffff;
-    --text-secondary: #b4b4b4;
-    --border-color: #565869;
+    --bg-color: #ffffff;       
+    --container-bg: #f8f9fa;   
+    --text-primary: #202123;
+    --text-secondary: #565869;
+    --border-color: #cccccc;
     --button-bg: #ececf1;
     --button-text: #202123;
     --button-hover-bg: #ffffff;
-    --error-color: #ff5c5c; 
+    --error-color: #ff5c5c;
 }
 
+/* some global */
 * {
     box-sizing: border-box;
     margin: 0;
     padding: 0;
 }
 
-body {
-    font-family: 'Inter';
+body.logsign-page {
+    --bg-color: #202123;
+    --container-bg: #343541;
+    --text-primary: #ffffff;
+    --text-secondary: #b4b4b4;
+    --border-color: #565869;
+}
+
+body.home-page {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    font-family: 'Inter', sans-serif;
     background-color: var(--bg-color);
     color: var(--text-primary);
+}
+
+body.home-page > .container {
+    flex: 1; /* pushes footer to the bottom */
+}
+
+/* login/signup */
+body.logsign-page {
     display: flex;
     justify-content: center;
     align-items: center;
@@ -29,28 +49,35 @@ body {
     padding: 1rem;
 }
 
-/* Here is the signup & login outer layer */
+footer {
+    margin-top: auto; /* pushes footer to bottom */
+    width: 100%;
+}
+
+
 .logsign-wrapper {
     width: 100%;
     max-width: 450px;
     padding: 2.5rem;
     text-align: center;
+    background-color: var(--container-bg);
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
 }
 
-.logsign-header h1{
+.logsign-header h1 {
     font-size: 2rem;
     font-weight: 700;
     margin-bottom: 2.5rem;
 }
 
-/* Here is the signup form & login form*/
 .form-field {
     margin-bottom: 1.5rem;
 }
+
 .form-field input {
     width: 100%;
     padding: 14px 16px;
-    font-family: 'Inter';
     font-size: 1rem;
     color: var(--text-primary);
     background-color: var(--bg-color);
@@ -59,14 +86,15 @@ body {
     outline: none;
     transition: border-color 0.2s;
 }
+
 .form-field input::placeholder {
     color: var(--text-secondary);
 }
+
 .form-field input:focus {
     border-color: var(--text-primary);
 }
 
-/* Here is the signup button & login button */
 .logsign-button {
     width: 100%;
     padding: 14px;
@@ -80,17 +108,17 @@ body {
     transition: background-color 0.2s;
     margin-top: 1rem;
 }
-.logsign-button:hover{
+
+.logsign-button:hover {
     background-color: var(--button-hover-bg);
 }
 
-/* Here is the link to switch to login/signup */
 .switch-form-link {
     margin-top: 2rem;
     font-size: 0.9rem;
 }
 
-.switch-form-link a{
+.switch-form-link a {
     color: var(--text-primary);
     text-decoration: underline;
     font-weight: 500;
@@ -98,4 +126,320 @@ body {
 
 .switch-form-link a:hover {
     text-decoration: none;
+}
+
+
+/* Artwork */
+.form-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 2rem 0;
+}
+
+.form-card {
+    background: var(--container-bg);
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+    padding: 2rem;
+    margin-bottom: 2rem;
+}
+
+.preview-image, .process-image-preview {
+    border-radius: 8px;
+    object-fit: cover;
+}
+
+.image-preview-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+/* Tags */
+.tag-badge {
+    background-color: var(--border-color);
+    color: var(--text-primary);
+    padding: 0.375rem 0.75rem;
+    border-radius: 50px;
+    margin-right: 0.5rem;
+    margin-bottom: 0.5rem;
+    display: inline-block;
+}
+
+.tag-badge .remove-tag {
+    margin-left: 0.5rem;
+    cursor: pointer;
+    color: var(--text-secondary);
+}
+
+.tag-badge .remove-tag:hover {
+    color: var(--error-color);
+}
+
+
+.avatar-preview {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 5px solid white;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.banner-preview {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+}
+
+.preview-container {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    padding: 2rem;
+    border-radius: 10px;
+    margin-bottom: 2rem;
+    position: relative;
+    min-height: 200px;
+}
+
+.avatar-container {
+    position: absolute;
+    bottom: -75px;
+    left: 50px;
+}
+
+.social-icon {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    margin-right: 10px;
+    color: white;
+}
+
+.instagram-bg {
+    background: linear-gradient(45deg, #405DE6, #5851DB, #833AB4, #C13584, #E1306C, #FD1D1D);
+}
+
+.twitter-bg {
+    background-color: #1DA1F2;
+}
+
+.website-bg {
+    background-color: #28a745;
+}
+
+
+.current-image {
+    width: 100%;       
+    height: auto;      
+    display: block;     
+    border-radius: 8px;
+    margin-bottom: 1rem; 
+}
+
+/* Profile Banner & Avatar */
+.profile-banner {
+    height: 250px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    position: relative;
+    margin-bottom: 80px;
+}
+
+.profile-avatar {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    border: 5px solid white;
+    object-fit: cover;
+    position: absolute;
+    bottom: -60px;
+    left: 20px;
+    background-color: white;
+}
+
+
+.profile-info {
+    margin-left: 160px;
+    padding: 10px 0;
+}
+
+/* Artwork Cards */
+.artwork-card {
+    transition: transform 0.2s;
+    margin-bottom: 2rem;
+    border: none;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.artwork-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 15px rgba(0,0,0,0.2);
+}
+
+.artwork-card .artwork-image{
+    height: 220px;
+    object-fit: cover;
+    width: 100%;
+}
+
+/* Social Links */
+.social-links a {
+    color: #6c757d;
+    text-decoration: none;
+    transition: color 0.2s;
+    margin-right: 10px;
+    font-size: 1.2rem;
+}
+
+.social-links a:hover {
+    color: #007bff;
+}
+
+/* Tabs */
+.nav-tabs .nav-link {
+    border: none;
+    color: #6c757d;
+    font-weight: 500;
+    padding: 0.6rem 1rem;
+}
+
+.nav-tabs .nav-link.active {
+    color: #007bff;
+    border-bottom: 3px solid #007bff;
+    background: none;
+}
+
+.empty-state {
+    padding: 3rem 1rem;
+    text-align: center;
+    color: #6c757d;
+}
+
+
+@media (max-width: 991px) {
+    .profile-avatar {
+        position: relative;
+        bottom: auto;
+        left: auto;
+        margin: -60px auto 0;
+        display: block;
+    }
+    .profile-info {
+        margin-left: 0;
+        text-align: center;
+    }
+    .profile-banner h2 {
+        line-height: normal;
+        font-size: 36px;
+    }
+}
+
+
+.artwork-hero {
+    background-color: #f8f9fa;
+    padding: 3rem 0;
+    margin-bottom: 3rem;
+}
+.artwork-hero .artwork-image {
+    width: 100%;
+    max-height: 600px;
+    object-fit: contain;
+    border-radius: 10px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+.artist-avatar {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+.like-btn {
+    border: none;
+    background: none;
+    cursor: pointer;
+    transition: all 0.3s;
+    padding: 0.5rem 1rem;
+    border-radius: 25px;
+    border: 2px solid #e9ecef;
+}
+.like-btn:hover {
+    border-color: #dc3545;
+    transform: scale(1.05);
+}
+.like-btn.liked {
+    background-color: #dc3545;
+    color: white;
+    border-color: #dc3545;
+}
+.like-btn:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+.process-slider {
+    margin: 2rem 0;
+}
+.swiper {
+    width: 100%;
+    height: 300px;
+    border-radius: 10px;
+    overflow: hidden;
+}
+.swiper-slide {
+    text-align: center;
+    background: #fff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.swiper-slide img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+.comment-section {
+    background-color: #f8f9fa;
+    border-radius: 10px;
+    padding: 2rem;
+    margin-top: 3rem;
+}
+.comment {
+    border-bottom: 1px solid #e9ecef;
+    padding: 1rem 0;
+}
+.comment:last-child {
+    border-bottom: none;
+}
+.comment-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+.comment-form {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+.price-tag {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #28a745;
+}
+.info-card {
+    background: white;
+    border-radius: 10px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    margin-bottom: 1.5rem;
+}
+.nav-link.active {
+    font-weight: bold;
+    border-bottom: 2px solid #007bff;
 }
