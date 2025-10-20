@@ -20,7 +20,7 @@
     padding: 0;
 }
 footer {
-    margin-top: auto; /* pushes footer to bottom */
+    margin-top: auto;
     width: 100%;
 }
 
@@ -35,101 +35,10 @@ body.home-page {
 }
 
 body.home-page > .container {
-    flex: 1; /* pushes footer to the bottom */
+    flex: 1; 
 }
 
 
-body.logsign-page {
-    --bg-color: #202123;
-    --container-bg: #343541;
-    --text-primary: #ffffff;
-    --text-secondary: #b4b4b4;
-    --border-color: #565869;
-    --button-bg: #4b4b4b;
-    --button-text: #ffffff;
-    --button-hover-bg: #565869;
-
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
-    padding: 1rem;
-    background-color: var(--bg-color);
-}
-
-body.logsign-page .logsign-wrapper {
-    width: 100%;
-    max-width: 450px;
-    padding: 2.5rem;
-    text-align: center;
-    background-color: var(--container-bg);
-    border-radius: 10px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-}
-
-body.logsign-page .logsign-header h1 {
-    font-size: 2rem;
-    font-weight: 700;
-    margin-bottom: 2.5rem;
-    color: var(--text-primary);
-}
-
-body.logsign-page .form-field {
-    margin-bottom: 1.5rem;
-}
-
-body.logsign-page .form-field input {
-    width: 100%;
-    padding: 14px 16px;
-    font-size: 1rem;
-    color: var(--text-primary);
-    background-color: var(--bg-color);
-    border: 1px solid var(--border-color);
-    border-radius: 6px;
-    outline: none;
-    transition: border-color 0.2s;
-}
-
-body.logsign-page .form-field input::placeholder {
-    color: var(--text-secondary);
-}
-
-body.logsign-page .form-field input:focus {
-    border-color: var(--text-primary);
-}
-
-body.logsign-page .logsign-button {
-    width: 100%;
-    padding: 14px;
-    font-size: 1rem;
-    font-weight: 500;
-    color: var(--button-text);
-    background-color: var(--button-bg);
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    transition: background-color 0.2s;
-    margin-top: 1rem;
-}
-
-body.logsign-page .logsign-button:hover {
-    background-color: var(--button-hover-bg);
-}
-
-body.logsign-page .switch-form-link {
-    margin-top: 2rem;
-    font-size: 0.9rem;
-}
-
-body.logsign-page .switch-form-link a {
-    color: var(--text-primary);
-    text-decoration: underline;
-    font-weight: 500;
-}
-
-body.logsign-page .switch-form-link a:hover {
-    text-decoration: none;
-}
 
 
 /* Artwork */
@@ -589,4 +498,162 @@ body.edit-profilebody {
     padding: 100px 20px 40px;
   }
 }
+
+
+body.logsign-page .logsign-header h1 {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 2.5rem;
+    color: var(--text-primary);
+}
+
+body.logsign-page .form-field {
+    margin-bottom: 1.5rem;
+}
+
+body.logsign-page .form-field input {
+    width: 100%;
+    padding: 14px 16px;
+    font-size: 1rem;
+    color: var(--text-primary);
+    background-color: var(--bg-color);
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+body.logsign-page .form-field input::placeholder {
+    color: var(--text-secondary);
+}
+
+body.logsign-page .form-field input:focus {
+    border-color: var(--text-primary);
+}
+
+body.logsign-page .logsign-button {
+    width: 100%;
+    padding: 14px;
+    font-size: 1rem;
+    font-weight: 500;
+    color: var(--button-text);
+    background-color: var(--button-bg);
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    margin-top: 1rem;
+}
+
+body.logsign-page .logsign-button:hover {
+    background-color: var(--button-hover-bg);
+}
+
+body.logsign-page .switch-form-link {
+    margin-top: 2rem;
+    font-size: 0.9rem;
+}
+
+body.logsign-page .switch-form-link a {
+    color: var(--text-primary);
+    text-decoration: underline;
+    font-weight: 500;
+}
+
+body.logsign-page .switch-form-link a:hover {
+    text-decoration: none;
+}
+
+
+body.logsign-page {
+    /* Dark theme overrides */
+    --bg-color: #202123;
+    --container-bg: #343541;
+    --text-primary: #ffffff;
+    --text-secondary: #b4b4b4;
+    --border-color: #565869;
+    --button-bg: #4b4b4b;
+    --button-text: #ffffff;
+    --button-hover-bg: #565869;
+
+    /* Centering setup */
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+
+    margin: 0;
+    padding: 0;
+    background-color: var(--bg-color);
+
+    /* Force it to fill the whole viewport even if parent has weird flex */
+    position: relative;
+}
+
+html, body.logsign-page {
+    height: 100%;
+}
+
+body.logsign-page .logsign-wrapper {
+    width: 100%;
+    max-width: 420px;
+    padding: 2.5rem;
+    background-color: var(--container-bg);
+    border-radius: 12px;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
+    text-align: center;
+    position: relative;
+    top: 0;
+    transform: translateY(0);
+}
+
+html, body {
+  height: 100%;
+}
+
+body.logsign-page {
+  --bg-color: #202123;
+  --container-bg: #343541;
+  --text-primary: #ffffff;
+  --text-secondary: #b4b4b4;
+  --border-color: #565869;
+  --button-bg: #4b4b4b;
+  --button-text: #ffffff;
+  --button-hover-bg: #565869;
+
+  height: 100vh;          
+  margin: 0;
+  padding: 0;
+  background-color: var(--bg-color);
+  position: relative;
+  overflow: hidden;       
+}
+
+
+body.logsign-page header,
+body.logsign-page nav,
+body.logsign-page .site-header,
+body.logsign-page .main-nav,
+body.logsign-page footer,
+body.logsign-page .site-footer {
+  display: none !important;
+}
+
+
+body.logsign-page .logsign-wrapper {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+
+  width: 100%;
+  max-width: 420px;
+  padding: 2.5rem;
+  background-color: var(--container-bg);
+  border-radius: 12px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
+  text-align: center;
+}
+
 

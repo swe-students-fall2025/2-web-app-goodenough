@@ -12,95 +12,97 @@
 </head>
 <body class="search-body">
     {% include 'navbar.html' %}
-    <!-- 主要内容 -->
-     {% set highlight_query = query %}
-    <div class="container" style="margin-top:40px;">
-        <!-- 搜索结果信息 -->
-        <div class="row mb-4">
-            <div class="col">
-                {% if query %}
-                    <h2>
-                        Search Results
-                        {% if artworks %}
-                            <span class="badge bg-primary">{{ artworks|length }} artworks</span>
-                        {% endif %}
-                    </h2>
-                    <p class="text-muted">Keywords: "<strong>{{ query }}</strong>"</p>
-                {% else %}
-                    <h2>All Artworks</h2>
-                {% endif %}
-            </div>
-        </div>
 
-        <!-- 筛选选项 -->
-        <div class="filter-section" style="display: none;">
-            <div class="row">
-                <div class="col-md-8">
-                    <h5>Filter Options</h5>
-                    <form class="row g-3" action="{{ url_for('search') }}" method="GET" id="searchForm">
-                        <input type="hidden" name="q" value="{{ query }}">
-                        <div class="col-md-4">
-                            <label for="mediumFilter" class="form-label">Medium</label>
-                            <select name="medium" id="mediumFilter" class="form-select">
-                                <option value="">All Mediums</option>
-                                <option value="Oil Painting">Oil Painting</option>
-                                <option value="Watercolor">Watercolor</option>
-                                <option value="Acrylic">Acrylic</option>
-                                <option value="Digital Art">Digital Art</option>
-                                <option value="Sculpture">Sculpture</option>
-                                <option value="Photography">Photography</option>
-                                <option value="Drawing">Drawing</option>
-                                <option value="Mixed Media">Mixed Media</option>
-                                <option value="Print">Print</option>
-                                <option value="Other">Other</option>
-                            </select>
+    <div class="page-wrapper" style="display: flex; flex-direction: column; min-height: 100vh;">
+        <main class="content" style="flex: 1;">
+            <div class="container" style="margin-top:40px;">
+                <!-- 搜索结果信息 -->
+                <div class="row mb-4">
+                    <div class="col">
+                        {% if query %}
+                            <h2>
+                                Search Results
+                                {% if artworks %}
+                                    <span class="badge bg-primary">{{ artworks|length }} artworks</span>
+                                {% endif %}
+                            </h2>
+                            <p class="text-muted">Keywords: "<strong>{{ query }}</strong>"</p>
+                        {% else %}
+                            <h2>All Artworks</h2>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- 筛选选项 -->
+                <div class="filter-section" style="display: none;">
+                    <div class="row">
+                        <div class="col-md-8">
+                            <h5>Filter Options</h5>
+                            <form class="row g-3" action="{{ url_for('search') }}" method="GET" id="searchForm">
+                                <input type="hidden" name="q" value="{{ query }}">
+                                <div class="col-md-4">
+                                    <label for="mediumFilter" class="form-label">Medium</label>
+                                    <select name="medium" id="mediumFilter" class="form-select">
+                                        <option value="">All Mediums</option>
+                                        <option value="Oil Painting">Oil Painting</option>
+                                        <option value="Watercolor">Watercolor</option>
+                                        <option value="Acrylic">Acrylic</option>
+                                        <option value="Digital Art">Digital Art</option>
+                                        <option value="Sculpture">Sculpture</option>
+                                        <option value="Photography">Photography</option>
+                                        <option value="Drawing">Drawing</option>
+                                        <option value="Mixed Media">Mixed Media</option>
+                                        <option value="Print">Print</option>
+                                        <option value="Other">Other</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="yearFilter" class="form-label">Year</label>
+                                    <input type="number" name="year" id="yearFilter" class="form-control" placeholder="e.g., 2023" min="1900" max="2030">
+                                </div>
+                                <div class="col-md-4 d-flex align-items-end">
+                                    <button type="submit" class="btn btn-primary me-2">Apply Filters</button>
+                                    <a href="{{ url_for('search') }}?q={{ query }}" class="btn btn-outline-secondary">Reset</a>
+                                </div>
+                            </form>
                         </div>
-                        <div class="col-md-4">
-                            <label for="yearFilter" class="form-label">Year</label>
-                            <input type="number" name="year" id="yearFilter" class="form-control" placeholder="e.g., 2023" min="1900" max="2030">
+                    </div>
+                </div>
+
+                <!-- 搜索结果网格 -->
+                <div class="row">
+                    {% if artworks %}
+                        {% include 'artwork_grid.html' %}
+                    {% else %}
+                        <div class="col-12 text-center py-5">
+                            <i class="fas fa-search fa-3x text-muted mb-3"></i>
+                            <h3 class="text-muted">
+                                {% if query %}
+                                    No artworks found for "{{ query }}"
+                                {% else %}
+                                    Please enter search keywords
+                                {% endif %}
+                            </h3>
+                            <p class="text-muted mb-4">
+                                {% if query %}
+                                    Try using different keywords or browse <a href="{{ url_for('index') }}">all artworks</a>
+                                {% else %}
+                                    Enter artwork titles, descriptions or tags in the search box to find artworks
+                                {% endif %}
+                            </p>
                         </div>
-                        <div class="col-md-4 d-flex align-items-end">
-                            <button type="submit" class="btn btn-primary me-2">Apply Filters</button>
-                            <a href="{{ url_for('search') }}?q={{ query }}" class="btn btn-outline-secondary">Reset</a>
-                        </div>
-                    </form>
+                    {% endif %}
                 </div>
             </div>
-        </div>
+        </main>
 
-        <!-- 搜索结果网格 -->
-        <div class="row">
-            {% if artworks %}
-                {% include 'artwork_grid.html' %}
-            {% else %}
-                <!-- 没有搜索结果的提示 -->
-                <div class="col-12 text-center py-5">
-                    <i class="fas fa-search fa-3x text-muted mb-3"></i>
-                    <h3 class="text-muted">
-                        {% if query %}
-                            No artworks found for "{{ query }}"
-                        {% else %}
-                            Please enter search keywords
-                        {% endif %}
-                    </h3>
-                    <p class="text-muted mb-4">
-                        {% if query %}
-                            Try using different keywords or browse <a href="{{ url_for('index') }}">all artworks</a>
-                        {% else %}
-                            Enter artwork titles, descriptions or tags in the search box to find artworks
-                        {% endif %}
-                    </p>
-                </div>
-            {% endif %}
-        </div>
+        {% include 'footer.html' %}
     </div>
-
-    {% include 'footer.html' %}
 
     <!-- Bootstrap & jQuery -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="{{ url_for('static', filename='js/script.js') }}"></script>
-
 </body>
+
 </html>
