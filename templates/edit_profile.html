@@ -1,240 +1,117 @@
-<!-- templates/edit_profile.html -->
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Edit Profile - Artfolio</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-
-
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Edit Profile - Artfolio</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
-<body>
-    <!-- 主要内容 -->
-    <div class="container form-container">
-        <!-- 页面标题 -->
-        <div class="form-header">
-            <h1 class="h3 mb-0">
-                <i class="fas fa-user-edit text-primary"></i> Edit Profile
-            </h1>
-            <p class="text-muted mb-0">
-                Update your profile information and social links
-            </p>
-        </div>
 
-        <!-- 预览区域 -->
-        <div class="preview-container">
-            <div id="bannerPreviewContainer">
-                {% if user.banner_image %}
-                <img src="{{ user.banner_image }}" alt="Banner preview" class="banner-preview" id="bannerPreview">
-                {% else %}
-                <div class="banner-preview bg-dark bg-opacity-25 d-flex align-items-center justify-content-center text-white">
-                    <div class="text-center">
-                        <i class="fas fa-image fa-3x mb-2"></i>
-                        <p class="mb-0">Banner Preview</p>
-                    </div>
-                </div>
-                {% endif %}
-            </div>
-            <div class="avatar-container">
-                <img src="{{ user.profile_image }}" alt="Avatar preview" class="avatar-preview" id="avatarPreview">
-            </div>
-        </div>
+<body class="edit-profilebody">
+  <div class="profile-edit-container">
+    <div class="banner-wrapper" id="bannerPreviewContainer">
+      {% if user.banner_image %}
+      <img src="{{ user.banner_image }}" alt="Banner preview" id="bannerPreview">
+      {% else %}
+      <div class="d-flex align-items-center justify-content-center h-100 text-muted">
+        <i class="fas fa-image me-2"></i> No banner uploaded
+      </div>
+      {% endif %}
 
-        <!-- 表单 -->
-        <form method="POST" enctype="multipart/form-data" id="profileForm">
-            <div class="form-card">
-                <!-- 步骤指示器 -->
-                <div class="step-indicator step-active">
-                    <span>Profile Image</span>
-                </div>
-
-                <!-- Banner URL -->
-                <div class="mb-4">
-                    <label for="banner_image" class="form-label">Banner Image URL</label>
-                    <input type="url" class="form-control" id="banner_image" name="banner_image"
-                           value="{{ user.banner_image if user.banner_image }}"
-                           placeholder="https://example.com/banner.jpg">
-                    <div class="form-text">Add a banner image to personalize your profile (recommended: 1200x300px)</div>
-                </div>
-
-                <!-- Avatar URL -->
-                <div class="mb-3">
-                    <label for="profile_image" class="form-label">Profile Image URL *</label>
-                    <input type="url" class="form-control" id="profile_image" name="profile_image"
-                           value="{{ user.profile_image }}"
-                           placeholder="https://example.com/avatar.jpg" required>
-                    <div class="form-text">Your profile picture (recommended: 150x150px, square image)</div>
-                </div>
-            </div>
-
-            <div class="form-card">
-                <!-- Bio -->
-                <div class="mb-3">
-                    <label for="bio" class="form-label">Bio</label>
-                    <textarea class="form-control" id="bio" name="bio" rows="4"
-                              placeholder="Tell the community about yourself, your artistic style, inspirations...">{{ user.bio if user.bio }}</textarea>
-                    <div class="form-text">Share something about yourself and your artistic journey</div>
-                </div>
-            </div>
-
-            <div class="form-card">
-                <div class="step-indicator">
-                    <span>Social Links</span>
-                </div>
-
-                <div class="mb-3">
-                    <p class="text-muted">Add your social media profiles to connect with other artists</p>
-
-                    <!-- Website -->
-                    <div class="mb-3">
-                        <div class="d-flex align-items-center mb-2">
-                            <div class="social-icon website-bg">
-                                <i class="fas fa-globe"></i>
-                            </div>
-                            <label for="website" class="form-label mb-0">Website</label>
-                        </div>
-                        <input type="url" class="form-control" id="website" name="website"
-                               value="{{ user.social_links.website if user.social_links and user.social_links.website }}"
-                               placeholder="https://your-website.com">
-                    </div>
-
-                    <!-- Instagram -->
-                    <div class="mb-3">
-                        <div class="d-flex align-items-center mb-2">
-                            <div class="social-icon instagram-bg">
-                                <i class="fab fa-instagram"></i>
-                            </div>
-                            <label for="instagram" class="form-label mb-0">Instagram</label>
-                        </div>
-                        <input type="url" class="form-control" id="instagram" name="instagram"
-                               value="{{ user.social_links.instagram if user.social_links and user.social_links.instagram }}"
-                               placeholder="https://instagram.com/yourusername">
-                    </div>
-
-                    <!-- Twitter -->
-                    <div class="mb-3">
-                        <div class="d-flex align-items-center mb-2">
-                            <div class="social-icon twitter-bg">
-                                <i class="fab fa-twitter"></i>
-                            </div>
-                            <label for="twitter" class="form-label mb-0">Twitter</label>
-                        </div>
-                        <input type="url" class="form-control" id="twitter" name="twitter"
-                               value="{{ user.social_links.twitter if user.social_links and user.social_links.twitter }}"
-                               placeholder="https://twitter.com/yourusername">
-                    </div>
-                </div>
-            </div>
-
-            <!-- 提交按钮 -->
-            <div class="d-flex justify-content-between">
-                <a href="{{ url_for('profile', user_id=current_user.id) }}"
-                   class="btn btn-outline-secondary">
-                    <i class="fas fa-arrow-left"></i> Cancel
-                </a>
-                <button type="submit" class="btn btn-primary">
-                    <i class="fas fa-save"></i> Update Profile
-                </button>
-            </div>
-        </form>
+      <div class="avatar-wrapper">
+        <img src="{{ user.profile_image }}" alt="Avatar preview" id="avatarPreview">
+      </div>
     </div>
-    <!-- Bootstrap & jQuery -->
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 
-    <script>
-        $(document).ready(function() {
-            // Banner图片预览
-            $('#banner_image').on('input', function() {
-                const url = $(this).val();
-                const container = $('#bannerPreviewContainer');
+    <div class="profile-content">
+      <h3><i class="fas fa-user-edit text-primary me-2"></i>Edit Profile</h3>
 
-                if (url) {
-                    container.html(`<img src="${url}" alt="Banner preview" class="banner-preview" id="bannerPreview">`);
-                } else {
-                    container.html(`
-                        <div class="banner-preview bg-dark bg-opacity-25 d-flex align-items-center justify-content-center text-white">
-                            <div class="text-center">
-                                <i class="fas fa-image fa-3x mb-2"></i>
-                                <p class="mb-0">Banner Preview</p>
-                            </div>
-                        </div>
-                    `);
-                }
-            });
+      <form method="POST" enctype="multipart/form-data" id="profileForm">
+        <div class="mb-3">
+          <label for="banner_image" class="form-label">Banner Image URL</label>
+          <input type="url" class="form-control" id="banner_image" name="banner_image"
+                 value="{{ user.banner_image if user.banner_image }}"
+                 placeholder="https://example.com/banner.jpg">
+          <div class="form-text">Recommended: 1200×300 px</div>
+        </div>
 
-            // 头像预览
-            $('#profile_image').on('input', function() {
-                const url = $(this).val();
-                const preview = $('#avatarPreview');
+        <div class="mb-4">
+          <label for="profile_image" class="form-label">Profile Image URL *</label>
+          <input type="url" class="form-control" id="profile_image" name="profile_image"
+                 value="{{ user.profile_image }}"
+                 placeholder="https://example.com/avatar.jpg" required>
+          <div class="form-text">Recommended: 128×128 px (square)</div>
+        </div>
 
-                if (url) {
-                    preview.attr('src', url);
-                }
-            });
+        <div class="section-divider"></div>
+        <div class="mb-4">
+          <label for="bio" class="form-label">Bio</label>
+          <textarea class="form-control" id="bio" name="bio" rows="4"
+                    placeholder="Write a short bio about yourself...">{{ user.bio if user.bio }}</textarea>
+        </div>
+        <div class="section-divider"></div>
 
-            // 表单提交验证
-            $('#profileForm').on('submit', function(e) {
-                const profileImage = $('#profile_image').val().trim();
+        <h5 class="mb-3">Social Links</h5>
+        <div class="social-input">
+          <div class="icon website"><i class="fas fa-globe"></i></div>
+          <input type="url" class="form-control" id="website" name="website"
+                 value="{{ user.social_links.website if user.social_links and user.social_links.website }}"
+                 placeholder="https://your-website.com">
+        </div>
 
-                if (!profileImage) {
-                    e.preventDefault();
-                    alert('Please provide a profile image URL');
-                    $('#profile_image').focus();
-                    return;
-                }
+        <div class="social-input">
+          <div class="icon instagram"><i class="fab fa-instagram"></i></div>
+          <input type="url" class="form-control" id="instagram" name="instagram"
+                 value="{{ user.social_links.instagram if user.social_links and user.social_links.instagram }}"
+                 placeholder="https://instagram.com/yourusername">
+        </div>
 
-                // 显示提交中状态
-                const submitBtn = $(this).find('button[type="submit"]');
-                submitBtn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Updating...');
-            });
+        <div class="social-input">
+          <div class="icon twitter"><i class="fab fa-twitter"></i></div>
+          <input type="url" class="form-control" id="twitter" name="twitter"
+                 value="{{ user.social_links.twitter if user.social_links and user.social_links.twitter }}"
+                 placeholder="https://twitter.com/yourusername">
+        </div>
 
-            // 搜索框回车提交
-            $('input[name="q"]').keypress(function(e) {
-                if (e.which === 13) {
-                    $(this).closest('form').submit();
-                }
-            });
+        <div class="d-flex justify-content-between align-items-center mt-4">
+          <a href="{{ url_for('profile', user_id=current_user.id) }}" class="btn btn-outline-secondary">
+            <i class="fas fa-arrow-left me-1"></i> Cancel
+          </a>
+          <button type="submit" class="btn btn-primary">
+            <i class="fas fa-save me-1"></i> Save Changes
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
 
-            // URL格式验证提示
-            $('input[type="url"]').on('blur', function() {
-                const url = $(this).val().trim();
-                if (url && !isValidUrl(url)) {
-                    $(this).addClass('is-invalid');
-                    // 添加错误提示
-                    if (!$(this).next('.invalid-feedback').length) {
-                        $(this).after('<div class="invalid-feedback">Please enter a valid URL (starting with http:// or https://)</div>');
-                    }
-                } else {
-                    $(this).removeClass('is-invalid');
-                    $(this).next('.invalid-feedback').remove();
-                }
-            });
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script>
+    $(function() {
+      $('#banner_image').on('input', function() {
+        const url = $(this).val();
+        const container = $('#bannerPreviewContainer');
+        if (url) {
+          container.html(`<img src="${url}" alt="Banner preview" id="bannerPreview">`);
+        } else {
+          container.html(`<div class="d-flex align-items-center justify-content-center h-100 text-muted"><i class="fas fa-image me-2"></i>No banner uploaded</div>`);
+        }
+      });
 
-            function isValidUrl(string) {
-                try {
-                    new URL(string);
-                    return true;
-                } catch (_) {
-                    return false;
-                }
-            }
+      $('#profile_image').on('input', function() {
+        const url = $(this).val();
+        $('#avatarPreview').attr('src', url);
+      });
 
-            // 社交链接输入提示
-            $('#instagram, #twitter').on('focus', function() {
-                const currentVal = $(this).val();
-                if (!currentVal) {
-                    const platform = $(this).attr('id');
-                    const placeholder = platform === 'instagram'
-                        ? 'https://instagram.com/yourusername'
-                        : 'https://twitter.com/yourusername';
-                    $(this).attr('placeholder', placeholder);
-                }
-            });
-        });
-    </script>
+      $('#profileForm').on('submit', function(e) {
+        if (!$('#profile_image').val().trim()) {
+          e.preventDefault();
+          alert('Please provide a profile image URL');
+        }
+      });
+    });
+  </script>
 </body>
 </html>

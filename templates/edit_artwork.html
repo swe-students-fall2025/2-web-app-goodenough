@@ -162,8 +162,8 @@
                 <div class="mb-3">
                     <label for="process_images" class="form-label">Process Images URLs</label>
                     <textarea class="form-control" id="process_images" name="process_images" rows="3"
-                              placeholder="Enter URLs for process images, one per line">{% if artwork.process_images %}{{ artwork.process_images|join('\n') }}{% endif %}</textarea>
-                    <div class="form-text">Add URLs showing your creative process (one URL per line)</div>
+                              placeholder="Enter URLs for process images">{% if artwork.process_images %}{{ artwork.process_images|join('\n') }}{% endif %}</textarea>
+                    <div class="form-text">Add URLs showing your creative process (allows multiple please use commas to seperate)</div>
 
                     <!-- 过程图片预览 -->
                     <div id="processImagesPreview" class="image-preview-container mt-2">

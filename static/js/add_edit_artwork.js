@@ -13,7 +13,6 @@ $(document).ready(function() {
     });
 
     // 初始预览（编辑模式）
-    
     {% if artwork and artwork.image_url %}
         $('#imagePreview').attr('src', '{{ artwork.image_url }}').show();
     {% endif %}
@@ -62,24 +61,32 @@ $(document).ready(function() {
         $('#tagsInput').val(tags.join(','));
     }
 
-    // 过程图片URL预览
-    $('#process_images').on('input', function() {
-        const urls = $(this).val().split('\n').filter(url => url.trim());
-        const container = $('#processImagesPreview');
-        container.empty();
 
-        urls.forEach(url => {
-            if (url.trim()) {
-                const img = $('<img>', {
-                    class: 'process-image-preview',
-                    src: url.trim(),
-                    alt: 'Process image',
-                    onerror: "this.style.display='none'"
-                });
-                container.append(img);
-            }
-        });
+
+$('#process_images').on('input', function() {
+    const rawText = $(this).val().trim();
+    const urls = rawText.split(',') 
+                        .map(item => item.split(/\s+/)) 
+                        .flat() 
+                        .map(url => url.trim()) 
+                        .filter(url => url.length > 0); 
+
+    const container = $('#processImagesPreview');
+    container.empty();
+
+    urls.forEach(url => {
+        const trimmedUrl = url.trim();
+        if (trimmedUrl) {
+            const img = $('<img>', {
+                class: 'process-image-preview',
+                src: trimmedUrl,
+                alt: 'Process image',
+                onerror: "this.style.display='none'",
+            });
+            container.append(img);
+        }
     });
+});
 
     // 表单提交验证
     $('#artworkForm').on('submit', function(e) {

@@ -1,5 +1,4 @@
-$(document).ready(function() {
-    function applyFilters() {
+function applyFilters() {
         const searchForm = $('#searchForm')[0];
         const mediumFilter = $('#mediumFilter').val();
         const yearFilter = $('#yearFilter').val();
@@ -26,6 +25,7 @@ $(document).ready(function() {
         searchForm.submit();
     }
 
+$(document).ready(function() {
     $('input[name="q"]').keypress(function(e) {
         if (e.which === 13) {
             $(this).closest('form').submit();
