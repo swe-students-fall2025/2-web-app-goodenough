@@ -159,7 +159,7 @@
                 </div>
 
                 <!-- 创作过程图片 -->
-                <div class="mb-3">
+                <div class="mb-4">
                     <label for="process_images" class="form-label">Process Images URLs</label>
                     <textarea class="form-control" id="process_images" name="process_images" rows="3"
                               placeholder="Enter URLs for process images">{% if artwork.process_images %}{{ artwork.process_images|join('\n') }}{% endif %}</textarea>
@@ -216,7 +216,7 @@
         </div>
     </div>
 
-    {% include 'footer.html' %}
+
 
     <!-- Bootstrap & jQuery -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -343,5 +343,6 @@
             $('#process_images').trigger('input');
         });
     </script>
+    {% include 'footer.html' %}
 </body>
 </html>
